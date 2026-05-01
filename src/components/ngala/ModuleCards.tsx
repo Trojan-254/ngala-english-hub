@@ -64,11 +64,12 @@ export const ModuleCards = () => {
               key={m.title}
               className={`lift-card relative rounded-2xl shadow-card overflow-hidden bg-gradient-to-br ${m.gradient} text-white p-6 min-h-[230px] flex flex-col`}
             >
-              <div className="absolute -right-6 -top-6 text-[140px] leading-none opacity-15 select-none">{m.icon}</div>
+              <div className="absolute -right-10 -top-10 w-48 h-48 rounded-full bg-white/10 select-none" />
+              <div className="absolute -right-20 top-16 w-40 h-40 rounded-full bg-white/5 select-none" />
 
               <div className="relative flex items-start gap-4">
-                <div className="w-14 h-14 rounded-xl bg-white/15 ring-1 ring-white/20 flex items-center justify-center text-3xl">
-                  {m.icon}
+                <div className="w-14 h-14 rounded-xl bg-white/15 ring-1 ring-white/20 flex items-center justify-center">
+                  <div className="w-6 h-6 rounded-md bg-white/90" />
                 </div>
                 <div className="flex-1">
                   <h3 className="text-xl font-extrabold leading-tight">{m.title}</h3>
