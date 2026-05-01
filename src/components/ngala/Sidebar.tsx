@@ -1,4 +1,5 @@
-import { BookOpen, Home, PenLine, BookMarked, FileText, Type, Trophy, User } from "lucide-react";
+import { BookOpen, Home, PenLine, BookMarked, FileText, Type, Trophy, User, Menu, X } from "lucide-react";
+import { useState, useEffect } from "react";
 
 const navItems = [
   { icon: Home, label: "Dashboard", active: true },
@@ -11,10 +12,27 @@ const navItems = [
 ];
 
 export const Sidebar = () => {
-  return (
-    <aside className="w-[240px] shrink-0 bg-primary text-primary-foreground flex flex-col min-h-screen sticky top-0">
+  const [open, setOpen] = useState(false);
+
+  // Close drawer on resize to desktop
+  useEffect(() => {
+    const onResize = () => {
+      if (window.innerWidth >= 1024) setOpen(false);
+    };
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+
+  // Lock body scroll when drawer open
+  useEffect(() => {
+    document.body.style.overflow = open ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
+  }, [open]);
+
+  const SidebarInner = (
+    <>
       {/* Logo */}
-      <div className="px-6 pt-7 pb-6">
+      <div className="px-6 pt-7 pb-6 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="w-11 h-11 rounded-xl bg-secondary/15 ring-1 ring-secondary/30 flex items-center justify-center">
             <BookOpen className="w-6 h-6 text-secondary" strokeWidth={2.5} />
@@ -24,6 +42,13 @@ export const Sidebar = () => {
             <div className="text-[11px] font-semibold text-secondary uppercase tracking-wider">English Hub</div>
           </div>
         </div>
+        <button
+          onClick={() => setOpen(false)}
+          className="lg:hidden p-1 rounded-md text-white/70 hover:text-white hover:bg-white/10"
+          aria-label="Close menu"
+        >
+          <X className="w-5 h-5" />
+        </button>
       </div>
 
       {/* User greeting */}
@@ -42,12 +67,13 @@ export const Sidebar = () => {
       </div>
 
       {/* Nav */}
-      <nav className="px-3 flex-1">
+      <nav className="px-3 flex-1 overflow-y-auto">
         <ul className="space-y-1">
           {navItems.map(({ icon: Icon, label, active }) => (
             <li key={label}>
               <a
                 href="#"
+                onClick={() => setOpen(false)}
                 className={[
                   "group flex items-center gap-3 pl-3 pr-3 py-2.5 rounded-lg text-sm font-medium transition-all",
                   active
@@ -66,6 +92,45 @@ export const Sidebar = () => {
       <div className="px-6 py-5 text-[11px] text-white/40">
         Powered by Pwani University TP 2026
       </div>
-    </aside>
+    </>
+  );
+
+  return (
+    <>
+      {/* Mobile/tablet hamburger trigger */}
+      <button
+        onClick={() => setOpen(true)}
+        className="lg:hidden fixed top-4 left-4 z-40 p-2.5 rounded-xl bg-primary text-primary-foreground shadow-lg ring-1 ring-white/10"
+        aria-label="Open menu"
+      >
+        <Menu className="w-5 h-5" />
+      </button>
+
+      {/* Backdrop (mobile/tablet) */}
+      {open && (
+        <div
+          onClick={() => setOpen(false)}
+          className="lg:hidden fixed inset-0 bg-black/50 z-40 animate-fade-in"
+        />
+      )}
+
+      {/* Desktop: fixed sidebar that stays put on scroll */}
+      <aside className="hidden lg:flex w-[240px] shrink-0 bg-primary text-primary-foreground flex-col fixed top-0 left-0 h-screen z-30">
+        {SidebarInner}
+      </aside>
+
+      {/* Spacer to reserve layout space for the fixed desktop sidebar */}
+      <div className="hidden lg:block w-[240px] shrink-0" aria-hidden="true" />
+
+      {/* Mobile/tablet drawer */}
+      <aside
+        className={[
+          "lg:hidden fixed top-0 left-0 h-screen w-[260px] bg-primary text-primary-foreground flex flex-col z-50 transition-transform duration-300",
+          open ? "translate-x-0" : "-translate-x-full",
+        ].join(" ")}
+      >
+        {SidebarInner}
+      </aside>
+    </>
   );
 };
