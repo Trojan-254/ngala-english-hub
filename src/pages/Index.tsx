@@ -21,8 +21,8 @@ const Index = () => {
               {/* Greeting */}
               <div className="flex items-end justify-between">
                 <div>
-                  <div className="text-sm font-semibold text-secondary uppercase tracking-wider">Karibu tena</div>
-                  <h2 className="text-3xl font-extrabold text-foreground mt-1">Habari, John 👋</h2>
+                  <div className="text-sm font-semibold text-secondary uppercase tracking-wider">Welcome back</div>
+                  <h2 className="text-3xl font-extrabold text-foreground mt-1">Hello, John 👋</h2>
                   <p className="text-sm text-muted-foreground mt-1">Five questions today and you keep your streak alive.</p>
                 </div>
                 <div className="text-xs text-muted-foreground">Friday, May 1</div>
