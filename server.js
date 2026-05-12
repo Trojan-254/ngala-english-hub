@@ -22,6 +22,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
+const authRoutes = require('./routes/auth');
+app.use('/api/auth', authRoutes);
+
 // Basic health check route — confirms server is running
 app.get('/health', (req, res) => {
   res.json({
