@@ -1,3 +1,23 @@
+/**
+ * Ngala English Hub - Server
+ * 
+ * This server handles user authentication, grammar quiz sessions, and real-time communication for the Ngala English Hub application. It uses Express for routing, Socket.io for real-time features, and SQLite for data storage.
+ * 
+ * Key features:
+ * - User registration and login with secure password hashing
+ * - Session management with automatic cleanup of expired sessions
+ * - Grammar quiz endpoints for starting sessions, submitting answers, and tracking progress
+ * - Real-time communication for classroom features using Socket.io
+ * 
+ * Written by SAMWUEL SIMIYU(EB01/PU/40792/21). STUDENT TEACHER ON TEACHING PRACTICE FROM PWANI UNIVERSITY.
+ * 
+ * To run:
+ * 1. Install dependencies: npm install
+ * 2. Start the server: node server.js
+ * 3. Access the app at http://localhost:5000
+ * 
+ * Note: Ensure the database is initialized before starting the server. The server will automatically create necessary tables if they don't exist.
+ */
 const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
@@ -17,13 +37,19 @@ const PORT = 5000;
 // Initialize database
 const db = getDb();
 
+// Import routes
+const authRoutes = require('./routes/auth');
+const grammarRoutes = require('./routes/grammar');
+
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-const authRoutes = require('./routes/auth');
+
+
 app.use('/api/auth', authRoutes);
+app.use('/api/grammar', grammarRoutes);
 
 // Basic health check route — confirms server is running
 app.get('/health', (req, res) => {

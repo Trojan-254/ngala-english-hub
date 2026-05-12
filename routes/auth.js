@@ -119,6 +119,9 @@ router.post('/logout', requireAuth, (req, res) => {
 });
 
 // ========== forgot password ===============
+router.post('/forgot-password', (req, res) => {
+  const db = getDb();
+})
 
   // TO-DO
 

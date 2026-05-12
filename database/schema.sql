@@ -44,12 +44,13 @@ CREATE TABLE IF NOT EXISTS modules (
 CREATE TABLE IF NOT EXISTS topics (
   id          INTEGER PRIMARY KEY AUTOINCREMENT,
   module_id   INTEGER NOT NULL REFERENCES modules(id),
-  title       TEXT NOT NULL,                   -- e.g. "Tenses", "Articles", "Prepositions"
+  title       TEXT NOT NULL,
   description TEXT,
-  curriculum  TEXT DEFAULT 'both',             -- '844' | 'CBE' | 'both'
-  difficulty  INTEGER NOT NULL DEFAULT 1,      -- 1=easy, 2=medium, 3=hard
+  curriculum  TEXT DEFAULT 'both',
+  difficulty  INTEGER NOT NULL DEFAULT 1,
   sort_order  INTEGER NOT NULL DEFAULT 0,
-  is_active   INTEGER NOT NULL DEFAULT 1
+  is_active   INTEGER NOT NULL DEFAULT 1,
+  UNIQUE(module_id, title)
 );
 
 -- Questions (grammar drills and past paper questions live here)
@@ -116,9 +117,9 @@ CREATE TABLE IF NOT EXISTS vocabulary (
 -- Past Papers (metadata for the Past Paper module)
 CREATE TABLE IF NOT EXISTS past_papers (
   id           INTEGER PRIMARY KEY AUTOINCREMENT,
-  title        TEXT NOT NULL,                  -- e.g. "KCSE 2022 English Paper 1"
+  title        TEXT NOT NULL UNIQUE,
   year         INTEGER NOT NULL,
-  paper_number INTEGER NOT NULL,               -- 1 or 2
+  paper_number INTEGER NOT NULL,
   subject      TEXT NOT NULL DEFAULT 'English',
   description  TEXT,
   is_active    INTEGER NOT NULL DEFAULT 1,
