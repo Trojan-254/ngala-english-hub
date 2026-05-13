@@ -1,6 +1,8 @@
+import { Link } from "react-router-dom";
+
 interface Mod {
   title: string;
-  icon: string;
+  to: string;
   desc: string;
   done: number;
   total: number;
@@ -13,7 +15,7 @@ interface Mod {
 const modules: Mod[] = [
   {
     title: "Grammar Drills",
-    icon: "⚔️",
+    to: "/arena/grammar",
     desc: "Conquer tenses, articles, and concord. Battle your weaknesses.",
     done: 47, total: 100, unit: "questions",
     stat: "47 questions completed · 68% accuracy",
@@ -21,7 +23,7 @@ const modules: Mod[] = [
   },
   {
     title: "Reading Comprehension",
-    icon: "🗺️",
+    to: "/arena/comprehension",
     desc: "Travel through passages. Find meaning between the lines.",
     done: 3, total: 10, unit: "passages",
     stat: "3 passages completed · 81% accuracy",
@@ -29,7 +31,7 @@ const modules: Mod[] = [
   },
   {
     title: "Past Papers",
-    icon: "📜",
+    to: "/arena/pastpapers",
     desc: "Face the KCSE. Timed. Real questions. No shortcuts.",
     done: 1, total: 5, unit: "papers",
     stat: "1 paper completed · Avg score 64%",
@@ -37,12 +39,12 @@ const modules: Mod[] = [
   },
   {
     title: "Vocabulary Builder",
-    icon: "🔤",
+    to: "/arena/vocabulary",
     desc: "Five new words a day. Build the arsenal of a Scholar.",
     done: 35, total: 200, unit: "words",
     stat: "35 words mastered",
     gradient: "from-destructive to-warm-orange",
-    extra: "5 words today ✅",
+    extra: "5 words today",
   },
 ];
 
@@ -90,9 +92,9 @@ export const ModuleCards = () => {
                   <div className="text-[11px] text-white/80">
                     {m.stat}{m.extra && <span className="ml-2">· {m.extra}</span>}
                   </div>
-                  <button className="px-4 py-2 rounded-lg bg-secondary text-primary text-sm font-bold hover:brightness-105 transition">
-                    Start →
-                  </button>
+                  <Link to={m.to} className="px-4 py-2 rounded-lg bg-secondary text-primary text-sm font-bold hover:brightness-105 transition">
+                    Enter Arena →
+                  </Link>
                 </div>
               </div>
             </article>
