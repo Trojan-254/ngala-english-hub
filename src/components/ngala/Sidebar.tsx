@@ -25,6 +25,7 @@ const navItems = [
 
 export const Sidebar = () => {
   const [open, setOpen] = useState(false);
+  const location = useLocation();
 
   // Close drawer on resize to desktop
   useEffect(() => {
