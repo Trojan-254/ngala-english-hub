@@ -82,21 +82,23 @@ export const Sidebar = () => {
       {/* Nav */}
       <nav className="px-3 flex-1 overflow-y-auto">
         <ul className="space-y-1">
-          {navItems.map(({ icon: Icon, label, active }) => (
+          {navItems.map(({ icon: Icon, label, to }) => (
             <li key={label}>
-              <a
-                href="#"
+              <NavLink
+                to={to}
                 onClick={() => setOpen(false)}
-                className={[
-                  "group flex items-center gap-3 pl-3 pr-3 py-2.5 rounded-lg text-sm font-medium transition-all",
-                  active
-                    ? "bg-white/10 border-l-4 border-secondary text-white"
-                    : "border-l-4 border-transparent text-white/75 hover:text-white hover:bg-white/5",
-                ].join(" ")}
+                className={({ isActive }) =>
+                  [
+                    "group flex items-center gap-3 pl-3 pr-3 py-2.5 rounded-lg text-sm font-medium transition-all",
+                    isActive
+                      ? "bg-white/10 border-l-4 border-secondary text-white"
+                      : "border-l-4 border-transparent text-white/75 hover:text-white hover:bg-white/5",
+                  ].join(" ")
+                }
               >
                 <Icon className="w-[18px] h-[18px]" strokeWidth={2} />
                 <span>{label}</span>
-              </a>
+              </NavLink>
             </li>
           ))}
         </ul>
