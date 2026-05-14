@@ -1,14 +1,26 @@
-import { BookOpen, Home, PenLine, BookMarked, FileText, Type, Trophy, User, Menu, X } from "lucide-react";
+import {
+  BookOpen,
+  Home,
+  PenLine,
+  BookMarked,
+  FileText,
+  Type,
+  Trophy,
+  User,
+  Menu,
+  X,
+} from "lucide-react";
 import { useState, useEffect } from "react";
+import { NavLink, useLocation } from "react-router-dom";
 
 const navItems = [
-  { icon: Home, label: "Dashboard", active: true },
-  { icon: PenLine, label: "Grammar Drills" },
-  { icon: BookMarked, label: "Reading" },
-  { icon: FileText, label: "Past Papers" },
-  { icon: Type, label: "Vocabulary" },
-  { icon: Trophy, label: "Leaderboard" },
-  { icon: User, label: "My Progress" },
+  { icon: Home, label: "Dashboard", to: "/dashboard" },
+  { icon: PenLine, label: "Grammar Drills", to: "/arena/grammar" },
+  { icon: BookMarked, label: "Reading", to: "/arena/comprehension" },
+  { icon: FileText, label: "Past Papers", to: "/arena/pastpapers" },
+  { icon: Type, label: "Vocabulary", to: "/arena/vocabulary" },
+  { icon: Trophy, label: "Leaderboard", to: "#" },
+  { icon: User, label: "My Progress", to: "#" },
 ];
 
 export const Sidebar = () => {
