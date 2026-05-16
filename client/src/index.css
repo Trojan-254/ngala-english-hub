@@ -1,0 +1,111 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Ngala English Hub palette (HSL) */
+    --background: 220 33% 97%;            /* #F7F9FC */
+    --foreground: 240 23% 14%;            /* #1A1A2E */
+
+    --card: 0 0% 100%;
+    --card-foreground: 240 23% 14%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 23% 14%;
+
+    --primary: 195 81% 23%;               /* #0B4F6C Deep Ocean Blue */
+    --primary-foreground: 0 0% 100%;
+    --primary-light: 195 60% 32%;
+
+    --secondary: 35 90% 58%;              /* #F4A932 Sand Gold */
+    --secondary-foreground: 240 23% 14%;
+
+    --success: 145 63% 49%;               /* #2ECC71 Mangrove Green */
+    --success-dark: 145 63% 42%;          /* #27AE60 */
+    --success-foreground: 0 0% 100%;
+
+    --destructive: 6 78% 57%;             /* #E74C3C Coral */
+    --destructive-foreground: 0 0% 100%;
+    --warm-orange: 28 80% 52%;            /* #E67E22 */
+
+    --purple-deep: 282 36% 36%;           /* #6C3483 */
+    --purple-light: 283 39% 53%;          /* #9B59B6 */
+
+    --muted: 220 14% 96%;
+    --muted-foreground: 220 9% 46%;       /* #6B7280 */
+
+    --accent: 35 90% 58%;
+    --accent-foreground: 240 23% 14%;
+
+    --border: 220 13% 91%;                /* #E5E7EB */
+    --input: 220 13% 91%;
+    --ring: 195 81% 23%;
+
+    --radius: 0.875rem;
+
+    --amber-soft: 48 100% 95%;            /* #FFF9E6 */
+
+    --shadow-card: 0 1px 2px hsl(240 23% 14% / 0.04), 0 4px 16px hsl(195 81% 23% / 0.06);
+    --shadow-lift: 0 10px 30px -10px hsl(195 81% 23% / 0.25);
+  }
+}
+
+@layer base {
+  * { @apply border-border; }
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Inter', system-ui, sans-serif;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1,h2,h3,h4 { font-family: 'Inter', sans-serif; font-weight: 700; letter-spacing: -0.01em; }
+}
+
+@layer utilities {
+  .stat-num { font-weight: 800; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+
+  /* Shimmer for XP bar */
+  .xp-shimmer::after {
+    content: "";
+    position: absolute; inset: 0;
+    background: linear-gradient(90deg, transparent 0%, hsl(0 0% 100% / 0.55) 50%, transparent 100%);
+    transform: translateX(-100%);
+    animation: shimmer 2.2s infinite;
+  }
+  @keyframes shimmer { 100% { transform: translateX(100%); } }
+
+  /* Pulse glow for current level node */
+  .pulse-glow {
+    animation: pulseGlow 2s ease-in-out infinite;
+  }
+  @keyframes pulseGlow {
+    0%, 100% { box-shadow: 0 0 0 0 hsl(var(--secondary) / 0.55); }
+    50%      { box-shadow: 0 0 0 14px hsl(var(--secondary) / 0); }
+  }
+
+  /* Module card lift */
+  .lift-card { transition: transform .35s cubic-bezier(.2,.8,.2,1), box-shadow .35s ease; }
+  .lift-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lift); }
+
+  /* Staggered slide-in (leaderboard rows) */
+  @keyframes slideInRight {
+    from { opacity: 0; transform: translateX(18px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+  .slide-in { animation: slideInRight .5s ease-out both; }
+
+  /* Weak areas entrance */
+  @keyframes sweepIn {
+    from { opacity: 0; transform: translateX(-24px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+  .sweep-in { animation: sweepIn .6s ease-out both; }
+
+  .badge-card { transition: transform .25s ease, box-shadow .25s ease; }
+  .badge-card:hover { transform: scale(1.06); }
+
+  .locked { filter: grayscale(1) opacity(.7); }
+}
