@@ -230,6 +230,19 @@ CREATE TABLE IF NOT EXISTS teacher_notes (
   created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
+
+CREATE TABLE IF NOT EXISTS class_codes (
+  id          INTEGER PRIMARY KEY AUTOINCREMENT,
+  code        TEXT NOT NULL UNIQUE,
+  class_group TEXT NOT NULL,
+  curriculum  TEXT NOT NULL,
+  created_by  INTEGER NOT NULL REFERENCES users(id),
+  expires_at  TEXT NOT NULL,
+  is_active   INTEGER NOT NULL DEFAULT 1,
+  created_at  TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+
 -- ============================================================
 -- INDEXES (performance on a slow lab machine matters)
 -- ============================================================

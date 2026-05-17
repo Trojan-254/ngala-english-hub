@@ -1,7 +1,10 @@
 import { Link } from "react-router-dom";
 import { Clock, Check } from "lucide-react";
 import { ArenaShell } from "@/components/ngala/ArenaShell";
-import { vocabCategories, moduleStats } from "@/lib/arenaData";
+// import { vocabCategories, moduleStats } from "@/lib/arenaData";
+
+const vocabCategories = [];
+const stats = { attempts: 0, accuracy: 0, xp: 0 };
 
 const VocabularyArena = () => {
   return (

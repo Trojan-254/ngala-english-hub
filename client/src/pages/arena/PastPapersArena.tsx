@@ -1,7 +1,10 @@
 import { Link } from "react-router-dom";
 import { Clock } from "lucide-react";
 import { ArenaShell } from "@/components/ngala/ArenaShell";
-import { pastPapers, moduleStats } from "@/lib/arenaData";
+// import { pastPapers, moduleStats } from "@/lib/arenaData";
+
+const pastPapers = [];
+const stats = { attempts: 0, accuracy: 0, xp: 0};
 
 const PastPapersArena = () => {
   const years = Array.from(new Set(pastPapers.map((p) => p.year))).sort((a, b) => b - a);

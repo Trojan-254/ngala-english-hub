@@ -1,32 +1,58 @@
-const items = [
-  { topic: "Tenses — Simple Past", acc: 42 },
-  { topic: "Subject–Verb Concord", acc: 51 },
-  { topic: "Articles (a / an / the)", acc: 58 },
-];
+import { Link } from "react-router-dom";
+import { TopicBreakdown } from "@/lib/api";
 
-export const WeakAreas = () => {
+interface Props {
+  topics: TopicBreakdown[];
+  loading: boolean;
+}
+
+export const WeakAreas = ({ topics, loading }: Props) => {
+  if (loading) {
+    return (
+      <section className="rounded-2xl bg-amber-soft border-l-4 border-secondary p-6 shadow-card animate-pulse">
+        <div className="h-4 bg-muted rounded w-40 mb-4" />
+        <div className="space-y-2">
+          {[1,2,3].map(i => <div key={i} className="h-12 bg-muted rounded-xl" />)}
+        </div>
+      </section>
+    );
+  }
+
+  if (topics.length === 0) {
+    return (
+      <section className="rounded-2xl bg-amber-soft border-l-4 border-secondary p-6 shadow-card">
+        <h3 className="font-extrabold text-foreground">Areas to Focus On</h3>
+        <p className="text-sm text-muted-foreground mt-2">
+          Complete more grammar drills to see your weak areas here.
+        </p>
+      </section>
+    );
+  }
+
   return (
     <section className="sweep-in rounded-2xl bg-amber-soft border-l-4 border-secondary p-6 shadow-card">
-      <h3 className="font-extrabold text-foreground flex items-center gap-2">
-        <span>⚠️</span> Areas to Focus On
-      </h3>
-      <p className="text-xs text-muted-foreground mt-1">These topics are slowing your XP — fix them and watch your accuracy climb.</p>
-
+      <h3 className="font-extrabold text-foreground">Areas to Focus On</h3>
+      <p className="text-xs text-muted-foreground mt-1">
+        These topics are slowing your XP — fix them and watch your accuracy climb.
+      </p>
       <ul className="mt-4 space-y-2.5">
-        {items.map((i) => (
+        {topics.map((t) => (
           <li
-            key={i.topic}
+            key={t.topic}
             className="flex items-center justify-between bg-card rounded-xl px-4 py-3 border border-border/60"
           >
             <div className="flex items-center gap-3">
-              <span className="text-sm font-semibold text-foreground">{i.topic}</span>
+              <span className="text-sm font-semibold text-foreground">{t.topic}</span>
               <span className="text-xs font-bold text-destructive bg-destructive/10 px-2 py-0.5 rounded-full">
-                {i.acc}% accuracy
+                {t.accuracy_pct}% accuracy
               </span>
             </div>
-            <a href="#" className="text-sm font-bold text-primary hover:text-primary-light transition">
+            <Link
+              to="/arena/grammar"
+              className="text-sm font-bold text-primary hover:text-primary-light transition"
+            >
               Practice Now →
-            </a>
+            </Link>
           </li>
         ))}
       </ul>

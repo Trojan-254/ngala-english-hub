@@ -21,9 +21,8 @@ function getExpiryDate() {
 // ===== registration ===========
 router.post('/register', (req, res) => {
   const db = getDb();
-  const { username, display_name, password, role, class_group, curriculum } = req.body;
+  const { username, display_name, password, role, class_code } = req.body;
 
-  // ========= Validation =========
   if (!username || !display_name || !password) {
     return res.status(400).json({ error: 'Username, display name and password are required' });
   }
@@ -32,6 +31,30 @@ router.post('/register', (req, res) => {
   }
   if (username.length < 3) {
     return res.status(400).json({ error: 'Username must be at least 3 characters' });
+  }
+
+  // Students must provide a class code
+  let class_group = null;
+  let curriculum = null;
+
+  if (role !== 'teacher') {
+    if (!class_code) {
+      return res.status(400).json({ error: 'A class code is required to register as a student' });
+    }
+
+    const code = db.prepare(`
+      SELECT * FROM class_codes
+      WHERE code = ?
+        AND is_active = 1
+        AND expires_at > datetime('now')
+    `).get(class_code.toUpperCase().trim());
+
+    if (!code) {
+      return res.status(400).json({ error: 'Invalid or expired class code. Ask your teacher for a valid code.' });
+    }
+
+    class_group = code.class_group;
+    curriculum = code.curriculum;
   }
 
   // Check username taken
@@ -50,14 +73,13 @@ router.post('/register', (req, res) => {
     display_name.trim(),
     password_hash,
     role === 'teacher' ? 'teacher' : 'student',
-    class_group || null,
-    curriculum || null
+    class_group,
+    curriculum
   );
 
   const sessionId = generateSessionId();
   db.prepare(`
-    INSERT INTO sessions (id, user_id, expires_at)
-    VALUES (?, ?, ?)
+    INSERT INTO sessions (id, user_id, expires_at) VALUES (?, ?, ?)
   `).run(sessionId, result.lastInsertRowid, getExpiryDate());
 
   const user = db.prepare(`

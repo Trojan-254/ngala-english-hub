@@ -52,7 +52,7 @@ export const api = {
     me: () => request<{ user: User }>('GET', '/auth/me'),
   },
 
-  // ─── GRAMMAR ────────────────────────────────────────────────
+  // ============= GRAMMAR =============== 
   grammar: {
     topics: (curriculum?: string) =>
       request<{ topics: Topic[] }>('GET', `/grammar/topics${curriculum ? `?curriculum=${curriculum}` : ''}`),
@@ -75,7 +75,7 @@ export const api = {
     progress: () => request<{ progress: ModuleProgress; topic_breakdown: TopicBreakdown[] }>('GET', '/grammar/progress'),
   },
 
-  // ─── COMPREHENSION ──────────────────────────────────────────
+  // ========== COMPREHENSION ============ 
   comprehension: {
     topics: (curriculum?: string) =>
       request<{ topics: Topic[] }>('GET', `/comprehension/topics${curriculum ? `?curriculum=${curriculum}` : ''}`),
@@ -100,7 +100,55 @@ export const api = {
 
     progress: () => request<{ progress: ModuleProgress; passage_history: unknown[] }>('GET', '/comprehension/progress'),
   },
-};
+
+  // =========== VOCABULARY ============= 
+  vocabulary: {
+    topics: () =>
+      request<{ topics: Topic[] }>('GET', '/vocabulary/topics'),
+
+    startSession: (topic_id: number) =>
+      request<{ session_id: number; words: VocabWord[] }>(
+        'POST', '/vocabulary/session/start', { topic_id }
+      ),
+
+    submitRating: (payload: {
+      vocab_id: number;
+      rating: 'forgot' | 'hard' | 'got';
+      session_id: number;
+    }) => request<{ next_review: string }>('POST', '/vocabulary/rate', payload),
+
+    progress: () =>
+      request<{ progress: ModuleProgress }>('GET', '/vocabulary/progress'),
+  },
+
+  // ================= PAST PAPERS ================== 
+  pastpapers: {
+    list: () =>
+      request<{ papers: PastPaper[] }>('GET', '/pastpapers'),
+
+    startSession: (paper_id: number) =>
+      request<{ session_id: number; paper: PastPaper; questions: Question[] }>(
+        'POST', '/pastpapers/session/start', { paper_id }
+      ),
+
+    submit: (payload: {
+      session_id: number;
+      answers: Record<number, string>;
+      time_taken_seconds: number;
+    }) => request<{ score: number; total: number; accuracy: number; grade: string }>(
+      'POST', '/pastpapers/session/submit', payload
+    ),
+
+    progress: () =>
+      request<{ progress: ModuleProgress }>('GET', '/pastpapers/progress'),
+  },
+
+  // ============== LEADERBOARD =============== 
+  leaderboard: {
+    weekly: () =>
+      request<{ leaderboard: LeaderboardEntry[] }>('GET', '/leaderboard/weekly'),
+  },
+}; // <-- Added closing brace for the api object
 
 // ========= SHARED TYPES ==============
 export interface User {
@@ -178,3 +226,34 @@ export interface TopicBreakdown {
   accuracy_pct: number;
 }
 
+export interface VocabWord {
+  id: number;
+  word: string;
+  definition: string;
+  part_of_speech: string;
+  example_sentence: string;
+  synonym: string;
+  antonym: string;
+  difficulty: number;
+}
+
+export interface PastPaper {
+  id: number;
+  title: string;
+  year: number;
+  paper_number: 1 | 2;
+  description: string;
+  duration_minutes: number;
+  question_count: number;
+  attempted: boolean;
+  score?: number;
+  date_attempted?: string;
+}
+
+export interface LeaderboardEntry {
+  id: number;
+  display_name: string;
+  weekly_xp: number;
+  level: number;
+  class_group: string;
+}

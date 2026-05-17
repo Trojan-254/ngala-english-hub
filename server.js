@@ -40,6 +40,8 @@ const db = getDb();
 // Import routes
 const authRoutes = require('./routes/auth');
 const grammarRoutes = require('./routes/grammar');
+// const comprehensionRoutes = require('./routes/comprehension');
+const teacherRoutes = require('./routes/teacher');
 
 // Middleware
 app.use(express.json());
@@ -47,9 +49,12 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 
-
+// ======== Routes ============
 app.use('/api/auth', authRoutes);
 app.use('/api/grammar', grammarRoutes);
+// app.use('/api/comprehension', comprehensionRoutes);
+app.use('/api/teacher', teacherRoutes);
+
 
 // Basic health check route — confirms server is running
 app.get('/health', (req, res) => {
