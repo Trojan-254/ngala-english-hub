@@ -121,6 +121,15 @@ export const api = {
       request<{ progress: ModuleProgress }>('GET', '/vocabulary/progress'),
   },
 
+  misc: {
+    wordOfDay: () => request<{ word: VocabWord }>('GET', '/word-of-day'),
+    weeklyLeaderboard: () => 
+      request<{ leaderboard: { id: number; display_name: string; weekly_xp: number; level: number }[] }>(
+         'GET', '/leaderboard/weekly'
+      ),
+    streak: () => request<{ days: {label: string; date: string; done: boolean; today: boolead }[]; streak: number; }>('GET', '/streak'),
+  },
+
   // ================= PAST PAPERS ================== 
   pastpapers: {
     list: () =>

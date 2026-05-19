@@ -17,8 +17,12 @@ const Login = () => {
     setError('');
     setLoading(true);
     try {
-      await login(username.trim(), password);
-      navigate('/dashboard');
+      const loggedInUser = await login(username.trim(), password);
+      if (loggedInUser.role === 'teacher') {
+        navigate('/teacher');
+      } else {
+        navigate('/dashboard');
+      }
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Login failed');
     } finally {
@@ -32,9 +36,11 @@ const Login = () => {
 
         {/* Logo */}
         <div className="flex items-center justify-center gap-3 mb-8">
-          <div className="w-12 h-12 rounded-xl bg-primary flex items-center justify-center">
-            <BookOpen className="w-6 h-6 text-white" strokeWidth={2.5} />
-          </div>
+          <img 
+            src="/logo.jpeg" 
+            alt="Ngala English Hub Logo"
+            className="w-12 h-12 object-contain"
+          />
           <div>
             <div className="text-2xl font-extrabold text-primary tracking-tight">Ngala</div>
             <div className="text-[11px] font-bold text-secondary uppercase tracking-widest">English Hub</div>
@@ -45,7 +51,7 @@ const Login = () => {
         <div className="bg-card rounded-2xl border border-border p-8"
           style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.08)' }}>
           <h1 className="text-xl font-extrabold text-foreground">Welcome back</h1>
-          <p className="text-sm text-muted-foreground mt-1">Sign in to continue your learning journey</p>
+          <p className="text-sm text-muted-foreground mt-1">Sign in to continue....</p>
 
           {error && (
             <div className="mt-4 px-4 py-3 rounded-lg bg-destructive/10 border border-destructive/20 text-sm text-destructive font-medium">

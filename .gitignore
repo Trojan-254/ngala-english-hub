@@ -2,3 +2,5 @@ node_modules/
 database/ngala.db
 .env
 *.db
+database/ngala.db-shm 
+database/ngala.db-wal

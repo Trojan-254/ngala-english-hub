@@ -146,7 +146,12 @@ CREATE TABLE IF NOT EXISTS attempts (
   is_correct     INTEGER NOT NULL,                         -- 0 or 1
   time_taken_ms  INTEGER,                                  -- response time in milliseconds
   xp_earned      INTEGER NOT NULL DEFAULT 0,
-  created_at     TEXT NOT NULL DEFAULT (datetime('now'))
+  created_at     TEXT NOT NULL DEFAULT (datetime('now')),
+  open_answer    TEXT,
+  marking_status  TEXT DEFAULT NULL,
+  marks_awarded  INTEGER DEFAULT NULL,
+  max_marks      INTEGER DEFAULT NULL,
+  teacher_feedback TEXT DEFAULT NULL
 );
 
 -- Session-level tracking (a "quiz session" - one sitting)

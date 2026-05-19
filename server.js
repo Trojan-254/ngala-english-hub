@@ -42,6 +42,10 @@ const authRoutes = require('./routes/auth');
 const grammarRoutes = require('./routes/grammar');
 // const comprehensionRoutes = require('./routes/comprehension');
 const teacherRoutes = require('./routes/teacher');
+const miscRoutes = require('./routes/misc');
+const contentRoutes = require('./routes/content');
+const pastPapersRoutes = require('./routes/pastpapers');
+const vocabularyRoutes = require('./routes/vocabulary');
 
 // Middleware
 app.use(express.json());
@@ -54,7 +58,10 @@ app.use('/api/auth', authRoutes);
 app.use('/api/grammar', grammarRoutes);
 // app.use('/api/comprehension', comprehensionRoutes);
 app.use('/api/teacher', teacherRoutes);
-
+app.use('/api', miscRoutes);
+app.use('/api/content', contentRoutes);
+app.use('/api/pastpapers', pastPapersRoutes);
+app.use('/api/vocabulary', vocabularyRoutes);
 
 // Basic health check route — confirms server is running
 app.get('/health', (req, res) => {

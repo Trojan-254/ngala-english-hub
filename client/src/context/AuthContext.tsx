@@ -39,11 +39,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  const login = async (username: string, password: string) => {
-    const { sessionId, user } = await api.auth.login(username, password);
-    localStorage.setItem('sessionId', sessionId);
-    setSessionId(sessionId);
-    setUser(user);
+  const login = async (username: string, password: string): Promise<User> => {
+    const { sessionId: newSessionId, user: loggedInUser } = await api.auth.login(username, password);
+    localStorage.setItem('sessionId', newSessionId);
+    setSessionId(newSessionId);
+    setUser(loggedInUser);
+    return loggedInUser;
   };
 
   const register = async (payload: {
