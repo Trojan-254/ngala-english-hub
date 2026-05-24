@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, Check, X, Zap } from "lucide-react";
-import { api, Question } from "@/lib/api";
+import { api, Question, Badge } from "@/lib/api";
 import { CountUp } from "@/components/ngala/CountUp";
 import { BadgeNotification } from '@/components/ngala/BadgeNotification';
 import { useConfetti } from '@/hooks/useConfetti';
@@ -86,7 +86,15 @@ const GrammarSession = () => {
       });
     }, 1000);
     return () => { if (tickRef.current) window.clearInterval(tickRef.current); };
-  }, [idx, confirmed, done, loading]);
+  }, [idx, confirmed, done, loading, questions]);
+
+  // Session completion effect with confetti
+  useEffect(() => {
+    if (done && questions.length > 0) {
+      const accuracy = Math.round((score / questions.length) * 100);
+      fireSession(accuracy);
+    }
+  }, [done, score, questions.length, fireSession]);
 
   const handleConfirm = async () => {
     if (!selected || !sessionId) return;
@@ -115,6 +123,8 @@ const GrammarSession = () => {
         setShowXpFloat(true);
         setTimeout(() => setShowXpFloat(false), 800);
       }
+      
+      // Handle new badges from response
       if (res.new_badges && res.new_badges.length > 0) {
         setNewBadges(res.new_badges);
       }
@@ -162,44 +172,48 @@ const GrammarSession = () => {
     );
   }
 
- useEffect(() => {
   if (done) {
     const accuracy = Math.round((score / questions.length) * 100);
     const perfect = accuracy === 100;
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-6">
-        <div className={`max-w-[680px] w-full bg-card rounded-2xl border p-10 text-center ${perfect ? "border-secondary animate-pulse" : "border-border"}`}
-          style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.08)" }}>
-          <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Session Complete</div>
-          <div className="mt-3 text-[48px] font-extrabold text-foreground tabular-nums leading-none">
-            <CountUp end={score} />/{questions.length}
-          </div>
-          <div className="mt-2 text-[48px] font-extrabold text-primary tabular-nums leading-none">
-            <CountUp end={accuracy} suffix="%" />
-          </div>
-          <div className="mt-6 flex items-center justify-center gap-2 text-warm-orange">
-            <Zap className="w-5 h-5" />
-            <span className="text-lg font-bold tabular-nums"><CountUp end={xp} /> XP total</span>
-          </div>
-          <div className="mt-6 h-2 bg-muted rounded-full overflow-hidden max-w-sm mx-auto">
-            <div className="h-full bg-success transition-all duration-700" style={{ width: `${accuracy}%` }} />
-          </div>
-          {perfect && <div className="mt-6 text-sm font-bold text-secondary">Grammar Ninja unlocked</div>}
-          <div className="mt-8 flex flex-wrap justify-center gap-3">
-            <button onClick={() => navigate("/arena/grammar")}
-              className="px-4 py-2.5 rounded-lg border border-border text-sm font-semibold hover:bg-muted">
-              Back to Arena
-            </button>
-            <button onClick={() => window.location.reload()}
-              className="px-4 py-2.5 rounded-lg bg-primary text-primary-foreground text-sm font-semibold">
-              Try Again
-            </button>
+      <>
+        <div className="min-h-screen bg-background flex items-center justify-center p-6">
+          <div className={`max-w-[680px] w-full bg-card rounded-2xl border p-10 text-center ${perfect ? "border-secondary animate-pulse" : "border-border"}`}
+            style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.08)" }}>
+            <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Session Complete</div>
+            <div className="mt-3 text-[48px] font-extrabold text-foreground tabular-nums leading-none">
+              <CountUp end={score} />/{questions.length}
+            </div>
+            <div className="mt-2 text-[48px] font-extrabold text-primary tabular-nums leading-none">
+              <CountUp end={accuracy} suffix="%" />
+            </div>
+            <div className="mt-6 flex items-center justify-center gap-2 text-warm-orange">
+              <Zap className="w-5 h-5" />
+              <span className="text-lg font-bold tabular-nums"><CountUp end={xp} /> XP total</span>
+            </div>
+            <div className="mt-6 h-2 bg-muted rounded-full overflow-hidden max-w-sm mx-auto">
+              <div className="h-full bg-success transition-all duration-700" style={{ width: `${accuracy}%` }} />
+            </div>
+            {perfect && <div className="mt-6 text-sm font-bold text-secondary">Grammar Ninja unlocked</div>}
+            <div className="mt-8 flex flex-wrap justify-center gap-3">
+              <button onClick={() => navigate("/arena/grammar")}
+                className="px-4 py-2.5 rounded-lg border border-border text-sm font-semibold hover:bg-muted">
+                Back to Arena
+              </button>
+              <button onClick={() => window.location.reload()}
+                className="px-4 py-2.5 rounded-lg bg-primary text-primary-foreground text-sm font-semibold">
+                Try Again
+              </button>
+            </div>
           </div>
         </div>
-      </div>
+        <BadgeNotification
+          badges={newBadges}
+          onDismiss={() => setNewBadges([])}
+        />
+      </>
     );
   }
- }, [done]);
 
   const q = questions[idx];
   const progress = ((idx + (confirmed ? 1 : 0)) / questions.length) * 100;
@@ -289,9 +303,9 @@ const GrammarSession = () => {
               {idx + 1 >= questions.length ? "Finish Session →" : "Next Question →"}
             </button>
             <BadgeNotification
-               badges={newBadges}
-               onDismiss={() => setNewBadges([])}
-             />
+              badges={newBadges}
+              onDismiss={() => setNewBadges([])}
+            />
           </>
         )}
       </div>
