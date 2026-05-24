@@ -21,10 +21,12 @@ import PastPapersArena from "./pages/arena/PastPapersArena";
 import PastPaperSession from "./pages/arena/PastPaperSession";
 import ProtectedTeacherRoute from "./components/teacher/ProtectedTeacherRoute.tsx";
 import TeacherOverview from "./pages/teacher/Overview.tsx";
+import ProgressPage from "./pages/Progress.tsx"
 import StudentsPage from "./pages/teacher/Students.tsx";
 import WeakTopicsPage from "./pages/teacher/WeakTopics.tsx";
 import CodesPage from "./pages/teacher/Codes.tsx";
-import LeaderboardPage from "./pages/teacher/Leaderboard.tsx";
+import LeaderboardPage from "./pages/teacher/LeaderBoard.tsx";
+import Leaderboard from "./pages/Leaderboard.tsx";
 import ContentHub from "./pages/teacher/content/ContentHub.tsx";
 import GrammarContent from "./pages/teacher/content/GrammarContent.tsx";
 import ComprehensionContent from "./pages/teacher/content/ComprehensionContent.tsx";
@@ -88,6 +90,8 @@ const App = () => (
             <Route path="/teacher/content/pastpapers" element={teacher(<PastPapersContent />)} />
             <Route path="/teacher/content/vocabulary" element={teacher(<VocabularyContent />)} />
             <Route path="/teacher/leaderboard" element={teacher(<LeaderboardPage />)} />
+            <Route path="/leaderboard" element={<Leaderboard />} />
+            <Route path="/progress" element={<ProgressPage />} />
 
               <Route path="*" element={<NotFound />} />
             </Routes>

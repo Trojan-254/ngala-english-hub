@@ -106,58 +106,105 @@ export const api = {
     topics: () =>
       request<{ topics: Topic[] }>('GET', '/vocabulary/topics'),
 
-    startSession: (topic_id: number) =>
+    startSession: (payload: { topic_id?: number; limit?: number }) =>
       request<{ session_id: number; words: VocabWord[] }>(
-        'POST', '/vocabulary/session/start', { topic_id }
+        'POST', '/vocabulary/session/start', payload
       ),
 
-    submitRating: (payload: {
-      vocab_id: number;
-      rating: 'forgot' | 'hard' | 'got';
-      session_id: number;
-    }) => request<{ next_review: string }>('POST', '/vocabulary/rate', payload),
+    rate: (payload: { vocab_id: number; rating: 'forgot' | 'hard' | 'got'; session_id: number }) =>
+      request<{ next_review: string; interval_days: number; xp_earned: number }>(
+        'POST', '/vocabulary/rate', payload
+      ),
 
     progress: () =>
-      request<{ progress: ModuleProgress }>('GET', '/vocabulary/progress'),
-  },
-
-  misc: {
-    wordOfDay: () => request<{ word: VocabWord }>('GET', '/word-of-day'),
-    weeklyLeaderboard: () => 
-      request<{ leaderboard: { id: number; display_name: string; weekly_xp: number; level: number }[] }>(
-         'GET', '/leaderboard/weekly'
+      request<{ mastered: number; due_today: number; total: number }>(
+        'GET', '/vocabulary/progress'
       ),
-    streak: () => request<{ days: {label: string; date: string; done: boolean; today: boolead }[]; streak: number; }>('GET', '/streak'),
   },
-
-  // ================= PAST PAPERS ================== 
+ 
+  //==== PAST PAPERS ==========
   pastpapers: {
     list: () =>
       request<{ papers: PastPaper[] }>('GET', '/pastpapers'),
 
     startSession: (paper_id: number) =>
-      request<{ session_id: number; paper: PastPaper; questions: Question[] }>(
+      request<{ session_id: number; paper: PastPaper; questions: PastPaperQuestion[]; duration_seconds: number }>(
         'POST', '/pastpapers/session/start', { paper_id }
       ),
 
-    submit: (payload: {
+    submitAnswer: (payload: {
+      question_id: number;
       session_id: number;
-      answers: Record<number, string>;
-      time_taken_seconds: number;
-    }) => request<{ score: number; total: number; accuracy: number; grade: string }>(
-      'POST', '/pastpapers/session/submit', payload
-    ),
+      answer?: string;
+      open_answer?: string;
+      time_taken_ms?: number;
+    }) => request<{
+      is_correct: boolean | null;
+      correct_answer: string | null;
+      explanation: string | null;
+      xp_earned: number;
+      marking_status: string | null;
+      message?: string;
+    }>('POST', '/pastpapers/answer', payload),
+
+    submitPaper: (payload: { session_id: number; time_taken_seconds: number }) =>
+      request<{ score: number; total: number; pending_marking: number; accuracy: number; grade: string; xp_earned: number; message: string }>(
+        'POST', '/pastpapers/session/submit', payload
+      ),
+
+    results: () =>
+      request<{ results: PastPaperResult[] }>('GET', '/pastpapers/results'),
+  }, 
+
+
+  // ========== MISC ============ 
+  misc: {
+     addToWordList: (vocab_id: number) =>
+       request<{ message: string }>('POST', '/word-list/add', { vocab_id }),
+
+     getWordList: () =>
+        request<{ words: VocabWord[] }>('GET', '/word-list'),
+
+     wordOfDay: () =>
+       request<{ word: VocabWord }>('GET', '/word-of-day'),
+
+     weeklyLeaderboard: () =>
+       request<{ leaderboard: LeaderboardEntry[] }>("GET", "/leaderboard/weekly"),
+
+    leaderboard: () =>
+      request<{ leaderboard: LeaderboardEntry[] }>("GET", "/leaderboard/weekly"),
 
     progress: () =>
-      request<{ progress: ModuleProgress }>('GET', '/pastpapers/progress'),
-  },
+      request<{
+        user: {
+          id: number;
+          display_name: string;
+          level: number;
+          xp_total: number;
+          weekly_xp: number;
+        };
+        modules: ModuleProgress[];
+        badges: Badge[];
+        xp_history: XpHistory[];
+        vocab: { words_reviewed: number; words_mastered: number };
+      }>("GET", "/progress"),
 
-  // ============== LEADERBOARD =============== 
-  leaderboard: {
-    weekly: () =>
-      request<{ leaderboard: LeaderboardEntry[] }>('GET', '/leaderboard/weekly'),
+    
+
+    // ============== LEADERBOARD =============== 
+    //leaderboard: {
+    //  weekly: () =>
+    //    request<{ leaderboard: LeaderboardEntry[] }>('GET', '/leaderboard/weekly'),
+    //},
+
+    // ======= STREAK ========
+    streak: () =>
+      request<{
+        days: { label: string; date: string; done: boolean; today: boolean; future: boolean }[];
+        streak: number;
+      }>('GET', '/streak'),
   },
-}; // <-- Added closing brace for the api object
+};
 
 // ========= SHARED TYPES ==============
 export interface User {
@@ -211,6 +258,8 @@ export interface AnswerResult {
   new_xp: number;
   new_level: number;
   levelled_up: boolean;
+  new_badges?: { slug: string; title: string; description: string; icon: string }[];
+
 }
 
 export interface SessionResult {
@@ -241,9 +290,11 @@ export interface VocabWord {
   definition: string;
   part_of_speech: string;
   example_sentence: string;
-  synonym: string;
-  antonym: string;
-  difficulty: number;
+  synonym: string | null;
+  antonym: string | null;
+  difficulty: 1 | 2 | 3;
+  topic_tag: string;
+  curriculum: string;
 }
 
 export interface PastPaper {
@@ -251,18 +302,66 @@ export interface PastPaper {
   title: string;
   year: number;
   paper_number: 1 | 2;
-  description: string;
+  subject: string;
+  description: string | null;
   duration_minutes: number;
   question_count: number;
-  attempted: boolean;
-  score?: number;
-  date_attempted?: string;
+  is_active: number;
+}
+
+export interface PastPaperQuestion {
+  id: number;
+  question_text: string;
+  question_type: 'mcq' | 'short_answer' | 'essay';
+  options: string[] | null;
+  xp_reward: number;
+  difficulty: number;
+  source: string | null;
+  max_marks: number | null;
+}
+
+export interface PastPaperResult {
+  session_id: number;
+  started_at: string;
+  ended_at: string;
+  score: number;
+  total_q: number;
+  xp_earned: number;
+  paper_title: string;
+  year: number;
+  paper_number: number;
 }
 
 export interface LeaderboardEntry {
   id: number;
   display_name: string;
-  weekly_xp: number;
-  level: number;
   class_group: string;
+  level: number;
+  xp_total: number;
+  weekly_xp: number;
+}
+
+export interface Badge {
+  slug: string;
+  title: string;
+  description: string;
+  icon: string;
+  earned_at: string;
+}
+
+export interface XpHistory {
+  xp_change: number;
+  reason: string;
+  created_at: string;
+}
+
+
+export class ApiError extends Error {
+  status: number;
+  body: string;
+  constructor(status: number, message: string, body: string) {
+    super(message);
+    this.status = status;
+    this.body = body;
+  }
 }

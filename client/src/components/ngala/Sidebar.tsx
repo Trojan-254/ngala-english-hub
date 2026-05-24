@@ -12,7 +12,6 @@ import {
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { NavLink, useLocation } from "react-router-dom";
-import { useAuth } from "@/context/AuthContext";
 
 const navItems = [
   { icon: Home, label: "Dashboard", to: "/dashboard" },
@@ -20,22 +19,13 @@ const navItems = [
   { icon: BookMarked, label: "Reading", to: "/arena/comprehension" },
   { icon: FileText, label: "Past Papers", to: "/arena/pastpapers" },
   { icon: Type, label: "Vocabulary", to: "/arena/vocabulary" },
-  { icon: Trophy, label: "Leaderboard", to: "#" },
-  { icon: User, label: "My Progress", to: "#" },
+  { icon: Trophy, label: "Leaderboard", to: "/leaderboard" },
+  { icon: User, label: "My Progress", to: "/progress" },
 ];
 
 export const Sidebar = () => {
   const [open, setOpen] = useState(false);
   const location = useLocation();
-  const { user } = useAuth();
-  const initials = user?.display_name
-    ?.split(' ')
-    .map(w => w[0])
-    .slice(0, 2)
-    .join('') ?? '??';
-
-  const levelNames = ['', 'Apprentice', 'Scribe', 'Wordsmith', 'Scholar', 'Griot'];
-  const levelName = levelNames[user?.level ?? 1];
 
   // Close drawer on resize to desktop
   useEffect(() => {
@@ -78,12 +68,12 @@ export const Sidebar = () => {
       <div className="mx-4 mb-6 p-3 rounded-xl bg-white/5 ring-1 ring-white/10">
         <div className="flex items-center gap-3">
           <div className="w-11 h-11 rounded-full bg-secondary text-primary font-extrabold flex items-center justify-center text-sm">
-            {initials}
+            JO
           </div>
           <div className="min-w-0">
-            <div className="font-bold text-sm truncate">{user?.display_name ?? 'Student'}</div>
+            <div className="font-bold text-sm truncate">John Otieno</div>
             <span className="inline-block mt-1 px-2 py-0.5 rounded-full bg-secondary/15 text-secondary text-[10px] font-bold tracking-wide">
-              Lv.{user?.level ?? 1} · {levelName}
+              Lv.3 · Wordsmith
             </span>
           </div>
         </div>
@@ -115,7 +105,7 @@ export const Sidebar = () => {
       </nav>
 
       <div className="px-6 py-5 text-[11px] text-white/40">
-        Powered by Katana Ngala Senior School ICT 2026
+        Powered by Pwani University TP 2026
       </div>
     </>
   );

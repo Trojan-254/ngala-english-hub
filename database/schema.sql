@@ -68,7 +68,8 @@ CREATE TABLE IF NOT EXISTS questions (
   curriculum     TEXT DEFAULT 'both',          -- '844' | 'CBE' | 'both'
   is_active      INTEGER NOT NULL DEFAULT 1,
   past_paper_id  INTEGER REFERENCES past_papers(id),
-  created_at     TEXT NOT NULL DEFAULT (datetime('now'))
+  created_at     TEXT NOT NULL DEFAULT (datetime('now')),
+  max_marks        INTEGER DEFAULT NULL
 );
 
 -- Passages (for Reading Comprehension module)
@@ -95,7 +96,9 @@ CREATE TABLE IF NOT EXISTS passage_questions (
   correct_answer TEXT NOT NULL,
   explanation    TEXT NOT NULL,
   xp_reward      INTEGER NOT NULL DEFAULT 15,
-  sort_order     INTEGER NOT NULL DEFAULT 0
+  sort_order     INTEGER NOT NULL DEFAULT 0,
+  max_marks      INTEGER DEFAULT NULL
+
 );
 
 -- Vocabulary (for Vocabulary Builder module)
@@ -122,6 +125,7 @@ CREATE TABLE IF NOT EXISTS past_papers (
   paper_number INTEGER NOT NULL,
   subject      TEXT NOT NULL DEFAULT 'English',
   description  TEXT,
+  duration_minutes   INTEGER DEFAULT 150,
   is_active    INTEGER NOT NULL DEFAULT 1,
   created_at   TEXT NOT NULL DEFAULT (datetime('now'))
 );
@@ -166,6 +170,15 @@ CREATE TABLE IF NOT EXISTS quiz_sessions (
   total_q      INTEGER DEFAULT 0,
   xp_earned    INTEGER DEFAULT 0,
   completed    INTEGER NOT NULL DEFAULT 0             -- 0 | 1
+);
+
+-- Word list
+CREATE TABLE IF NOT EXISTS word_list (
+  id         INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id    INTEGER NOT NULL REFERENCES users(id),
+  vocab_id   INTEGER NOT NULL REFERENCES vocabulary(id),
+  created_at TEXT NOT NULL DEFAULT (datetime('now')),
+  UNIQUE(user_id, vocab_id)
 );
 
 -- Vocabulary review tracking (spaced repetition data)
@@ -396,8 +409,17 @@ INSERT OR IGNORE INTO badges (slug, title, description, icon, condition) VALUES
   ('level_5',          'Griot',            'Reached the highest level — Level 5',                    '🌍', '{"type":"level","threshold":5}'),
   ('all_modules',      'All-Rounder',      'Completed at least one session in all four modules',     '🏅', '{"type":"module_diversity","threshold":4}'),
   ('night_owl',        'Night Owl',        'Studied after 8pm',                                      '🦉', '{"type":"time_of_day","hour_after":20}'),
-  ('comeback_kid',     'Comeback Kid',     'Retried a failed quiz and passed it',                    '💪', '{"type":"retry_success"}');
-
+  ('comeback_kid',     'Comeback Kid',     'Retried a failed quiz and passed it',                    '💪', '{"type":"retry_success"}'),
+  ('grammar_first',    'Grammar Initiate',    'Answered your first grammar question',           '⚔️',  '{"type":"module_first","module":"grammar"}'),
+  ('reading_first',    'First Reader',        'Completed your first reading passage',           '📖',  '{"type":"module_first","module":"comprehension"}'),
+  ('vocab_first',      'Word Apprentice',     'Reviewed your first vocabulary word',            '🔤',  '{"type":"module_first","module":"vocabulary"}'),
+  ('papers_first',     'Exam Entrant',        'Attempted your first past paper',                '📜',  '{"type":"paper_completed","module":"pastpapers"}'),
+  ('all_modules',      'All-Rounder',         'Tried all four learning modules',                '🏅',  '{"type":"all_modules_tried"}'),
+  ('questions_10',     'Getting Started',     'Answered 10 questions',                          '🌱',  '{"type":"questions_milestone","threshold":10}'),
+  ('questions_50',     'Dedicated Learner',   'Answered 50 questions',                          '💪',  '{"type":"questions_milestone","threshold":50}'),
+  ('questions_100',    'Century Scholar',     'Answered 100 questions',                         '💯',  '{"type":"questions_milestone","threshold":100}'),
+  ('comeback_kid',     'Comeback Kid',        'Retried a question and got it right',            '💪',  '{"type":"retry_success"}'),
+  ('night_owl',        'Night Owl',           'Studied after 8pm',                              '🦉',  '{"type":"time_of_day","hour_after":20}');
 -- ============================================================
 -- SEED DATA — Past Papers metadata
 -- ============================================================

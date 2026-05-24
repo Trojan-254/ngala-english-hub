@@ -168,4 +168,18 @@ export const contentApi = {
     request<{ queue: MarkingQueueItem[] }>(`/marking-queue${qs({ status })}`),
   markAnswer: (attemptId: number, marks_awarded: number, feedback?: string) =>
     request<{ message: string; xp_awarded: number }>(`/marking-queue/${attemptId}/mark`, "POST", { marks_awarded, feedback }),
+  // Get comprehension topics
+  getComprehensionTopics: () =>
+    request<{ topics: { id: number; title: string; curriculum: string }[] }>(
+      '/passages/topics', 'GET'
+    ),
+  // Topics
+  getTopics: (module_slug?: string) =>
+    request<{ topics: Topic[] }>(`/topics${qs({ module_slug })}`),
+  createTopic: (payload: { module_slug: string; title: string; description?: string; curriculum: string; difficulty: number }) =>
+    request<{ id: number; message: string }>('/topics', 'POST', payload),
+  updateTopic: (id: number, payload: Partial<Topic>) =>
+    request<{ message: string }>(`/topics/${id}`, 'PUT', payload),
+  deleteTopic: (id: number) =>
+    request<{ message: string }>(`/topics/${id}`, 'DELETE'),
 };

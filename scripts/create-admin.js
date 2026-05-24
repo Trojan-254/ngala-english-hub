@@ -4,8 +4,8 @@ const bcrypt = require('bcrypt');
 const db = getDb();
 
 const username = process.argv[2] || 'teacher';
-const display_name = process.argv[3] || 'Cooperating Teacher';
-const password = process.argv[4] || 'teacher123';
+const display_name = process.argv[3] || 'Teacher';
+const password = process.argv[4] || 'teach1234';
 
 const existing = db.prepare('SELECT id FROM users WHERE username = ?').get(username);
 if (existing) {

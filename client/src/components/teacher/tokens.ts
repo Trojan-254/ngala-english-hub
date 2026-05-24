@@ -32,9 +32,14 @@ export function initialsOf(name: string): string {
     .join("")
     .toUpperCase();
 }
+
+
 export function relativeTime(iso: string | null): string {
   if (!iso) return "Never";
-  const then = new Date(iso).getTime();
+  // SQLite returns "2026-05-19 11:06:24" — replaced space with T for valid ISO
+  const normalized = iso.includes('T') ? iso : iso.replace(' ', 'T') + 'Z';
+  const then = new Date(normalized).getTime();
+  if (isNaN(then)) return "Never";
   const diff = Date.now() - then;
   const mins = Math.floor(diff / 60000);
   if (mins < 1) return "just now";
@@ -43,8 +48,10 @@ export function relativeTime(iso: string | null): string {
   if (hrs < 24) return `${hrs} hour${hrs === 1 ? "" : "s"} ago`;
   const days = Math.floor(hrs / 24);
   if (days < 30) return `${days} day${days === 1 ? "" : "s"} ago`;
-  return new Date(iso).toLocaleDateString();
+  return new Date(normalized).toLocaleDateString();
 }
+
+
 export function moduleLabel(slug: string): string {
   const map: Record<string, string> = {
     grammar: "Grammar Drills",

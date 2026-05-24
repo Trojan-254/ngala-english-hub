@@ -88,14 +88,33 @@ router.post('/answer', requireAuth, (req, res) => {
   if (!session) return res.status(403).json({ error: 'Invalid session' });
 
   let is_correct = 0;
-  let xp_earned = 0;
+  //let xp_earned = 0;
   let marking_status = null;
 
   if (question.question_type === 'mcq') {
     // Auto-mark MCQ
     is_correct = answer?.toString().trim().toUpperCase() ===
       question.correct_answer?.toString().trim().toUpperCase() ? 1 : 0;
-    xp_earned = is_correct ? (question.xp_reward || 20) : 0;
+    const previousCorrect = db.prepare(`
+      SELECT id FROM attempts
+      WHERE user_id = ? AND question_id = ? AND is_correct = 1
+    `).get(req.user.id, question_id);
+    const xp_earned = (is_correct && !previousCorrect) ? question.xp_reward : 0;
+
+    // Evaluate badges after every answer
+    const newBadges = evaluateAndAwardBadges(req.user.id);
+
+    res.json({
+      is_correct: is_correct === 1,
+      correct_answer: question.correct_answer,
+      explanation: question.explanation,
+      xp_earned,
+      new_xp,
+      new_level,
+      levelled_up,
+      new_badges: newBadges  // ← send newly earned badges to frontend
+    });
+
   } else {
     // Open-ended — submit for teacher marking
     marking_status = 'pending';

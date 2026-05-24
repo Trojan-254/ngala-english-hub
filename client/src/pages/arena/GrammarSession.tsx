@@ -3,6 +3,8 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, Check, X, Zap } from "lucide-react";
 import { api, Question } from "@/lib/api";
 import { CountUp } from "@/components/ngala/CountUp";
+import { BadgeNotification } from '@/components/ngala/BadgeNotification';
+import { useConfetti } from '@/hooks/useConfetti';
 
 const QUESTION_TIME = 20;
 
@@ -31,6 +33,8 @@ const TimerRing = ({ seconds }: { seconds: number }) => {
 };
 
 const GrammarSession = () => {
+  const { fireSession } = useConfetti();
+  const [newBadges, setNewBadges] = useState<Badge[]>([]);
   const { topicId } = useParams();
   const navigate = useNavigate();
 
@@ -90,11 +94,13 @@ const GrammarSession = () => {
 
     const q = questions[idx];
     const timeTaken = (QUESTION_TIME - seconds) * 1000;
+ 
+    const selectedLetter = String.fromCharCode(65 + q.options.indexOf(selected));
 
     try {
       const res = await api.grammar.submitAnswer({
         question_id: q.id,
-        answer: selected,
+        answer: selectedLetter,
         session_id: sessionId,
         time_taken_ms: timeTaken,
       });
@@ -108,6 +114,9 @@ const GrammarSession = () => {
         setXp(res.new_xp);
         setShowXpFloat(true);
         setTimeout(() => setShowXpFloat(false), 800);
+      }
+      if (res.new_badges && res.new_badges.length > 0) {
+        setNewBadges(res.new_badges);
       }
     } catch (err) {
       console.error('Answer submission failed:', err);
@@ -153,6 +162,7 @@ const GrammarSession = () => {
     );
   }
 
+ useEffect(() => {
   if (done) {
     const accuracy = Math.round((score / questions.length) * 100);
     const perfect = accuracy === 100;
@@ -189,6 +199,7 @@ const GrammarSession = () => {
       </div>
     );
   }
+ }, [done]);
 
   const q = questions[idx];
   const progress = ((idx + (confirmed ? 1 : 0)) / questions.length) * 100;
@@ -228,7 +239,9 @@ const GrammarSession = () => {
             {q.options.map((opt, i) => {
               const letter = String.fromCharCode(65 + i);
               const isSel = selected === opt;
-              const isCorrect = confirmed && opt === correctAnswer;
+              const isCorrect = confirmed && letter === correctAnswer;
+              const isWrong = confirmed && isSel && !isCorrect;
+
               let cls = "border-border bg-card hover:border-primary/40 hover:bg-primary/5";
               if (!confirmed && isSel) cls = "border-primary bg-primary/10";
               if (confirmed) {
@@ -275,6 +288,10 @@ const GrammarSession = () => {
               className="mt-5 w-full bg-primary text-primary-foreground rounded-lg py-3 text-sm font-bold hover:brightness-110 transition">
               {idx + 1 >= questions.length ? "Finish Session →" : "Next Question →"}
             </button>
+            <BadgeNotification
+               badges={newBadges}
+               onDismiss={() => setNewBadges([])}
+             />
           </>
         )}
       </div>

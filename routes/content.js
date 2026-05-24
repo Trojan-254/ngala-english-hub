@@ -33,13 +33,44 @@ router.get('/questions', requireTeacher, (req, res) => {
   query += ` ORDER BY q.created_at DESC`;
 
   const questions = db.prepare(query).all(...params);
+  const parsed = questions.map(q => {
+  let options = [];
+  if (q.options) {
+    try {
+      options = JSON.parse(q.options);
+    } catch {
+      // options may be double-escaped — try fixing it
+      try {
+        options = JSON.parse(q.options.replace(/\\"/g, '"'));
+      } catch {
+        options = [];
+      }
+    }
+  }
+  return { ...q, options };
+});
+
+  res.json({ questions: parsed });
+});
+
+
+router.get('/passages/:id/questions', requireTeacher, (req, res) => {
+  const db = getDb();
+
+  const questions = db.prepare(`
+    SELECT * FROM passage_questions
+    WHERE passage_id = ?
+    ORDER BY sort_order ASC
+  `).all(req.params.id);
+
   const parsed = questions.map(q => ({
     ...q,
-    options: q.options ? JSON.parse(q.options) : []
+    options: q.options ? (() => { try { return JSON.parse(q.options); } catch { return []; } })() : []
   }));
 
   res.json({ questions: parsed });
 });
+
 
 // POST — create a new question
 router.post('/questions', requireTeacher, (req, res) => {
@@ -598,6 +629,125 @@ router.post('/marking-queue/:attemptId/mark', requireTeacher, (req, res) => {
   }
 
   res.json({ message: 'Answer marked successfully', xp_awarded: xp_earned });
+});
+
+router.get('/passages/topics', requireTeacher, (req, res) => {
+  const db = getDb();
+  const topics = db.prepare(`
+    SELECT t.id, t.title, t.curriculum, t.difficulty
+    FROM topics t
+    JOIN modules m ON t.module_id = m.id
+    WHERE m.slug = 'comprehension'
+      AND t.is_active = 1
+    ORDER BY t.sort_order ASC
+  `).all();
+  res.json({ topics });
+});
+
+// GET all topics for a module
+router.get('/topics', requireTeacher, (req, res) => {
+  const db = getDb();
+  const { module_slug } = req.query;
+
+  let query = `
+    SELECT t.*, m.slug as module_slug,
+      COUNT(q.id) as question_count
+    FROM topics t
+    JOIN modules m ON t.module_id = m.id
+    LEFT JOIN questions q ON q.topic_id = t.id AND q.is_active = 1
+    WHERE t.is_active = 1
+  `;
+
+  const params = [];
+  if (module_slug) {
+    query += ` AND m.slug = ?`;
+    params.push(module_slug);
+  }
+
+  query += ` GROUP BY t.id ORDER BY t.sort_order ASC`;
+
+  const topics = db.prepare(query).all(...params);
+  res.json({ topics });
+});
+
+// POST — create a new topic
+router.post('/topics', requireTeacher, (req, res) => {
+  const db = getDb();
+  const { module_slug, title, description, curriculum, difficulty } = req.body;
+
+  if (!module_slug || !title) {
+    return res.status(400).json({ error: 'module_slug and title are required' });
+  }
+
+  const module = db.prepare(`SELECT id FROM modules WHERE slug = ?`).get(module_slug);
+  if (!module) return res.status(404).json({ error: 'Module not found' });
+
+  // Check duplicate
+  const existing = db.prepare(`
+    SELECT id FROM topics WHERE module_id = ? AND title = ?
+  `).get(module.id, title.trim());
+
+  if (existing) {
+    return res.status(409).json({ error: 'A topic with this name already exists in this module' });
+  }
+
+  // Get next sort order
+  const maxOrder = db.prepare(`
+    SELECT COALESCE(MAX(sort_order), 0) as max_order
+    FROM topics WHERE module_id = ?
+  `).get(module.id);
+
+  const result = db.prepare(`
+    INSERT INTO topics (module_id, title, description, curriculum, difficulty, sort_order, is_active)
+    VALUES (?, ?, ?, ?, ?, ?, 1)
+  `).run(
+    module.id,
+    title.trim(),
+    description ? description.trim() : null,
+    curriculum || 'both',
+    difficulty || 1,
+    maxOrder.max_order + 1
+  );
+
+  res.status(201).json({
+    id: result.lastInsertRowid,
+    message: 'Topic created successfully'
+  });
+});
+
+// PUT — edit a topic
+router.put('/topics/:id', requireTeacher, (req, res) => {
+  const db = getDb();
+  const { title, description, curriculum, difficulty } = req.body;
+
+  db.prepare(`
+    UPDATE topics SET
+      title       = COALESCE(?, title),
+      description = COALESCE(?, description),
+      curriculum  = COALESCE(?, curriculum),
+      difficulty  = COALESCE(?, difficulty)
+    WHERE id = ?
+  `).run(title, description, curriculum, difficulty, req.params.id);
+
+  res.json({ message: 'Topic updated' });
+});
+
+// DELETE — soft delete topic
+router.delete('/topics/:id', requireTeacher, (req, res) => {
+  const db = getDb();
+
+  const questionCount = db.prepare(`
+    SELECT COUNT(*) as count FROM questions WHERE topic_id = ? AND is_active = 1
+  `).get(req.params.id);
+
+  if (questionCount.count > 0) {
+    return res.status(400).json({
+      error: `Cannot delete topic with ${questionCount.count} active questions. Delete the questions first.`
+    });
+  }
+
+  db.prepare(`UPDATE topics SET is_active = 0 WHERE id = ?`).run(req.params.id);
+  res.json({ message: 'Topic deleted' });
 });
 
 module.exports = router;

@@ -3,6 +3,7 @@ import { useSocket } from "@/context/SocketContext";
 import { useAuth } from "@/context/AuthContext";
 import { useEffect, useState } from "react";
 import { api, VocabWord } from "@/lib/api";
+import { Badges } from "./Badges";
 
 interface StreakDay {
   label: string;
@@ -34,6 +35,23 @@ export const RightSidebar = () => {
   const [streak, setStreak] = useState(0);
   const [wordOfDay, setWordOfDay] = useState<VocabWord | null>(null);
   const [restLeaderboard, setRestLeaderboard] = useState<LeaderEntry[]>([]);
+
+  const [adding, setAdding] = useState(false);
+  const [added, setAdded] = useState(false);
+
+  const handleAddToList = async () => {
+    if (!wordOfDay || adding || added) return;
+    setAdding(true);
+    try {
+      await api.misc.addToWordList(wordOfDay.id);
+      setAdded(true);
+    } catch (e) {
+      // Already in list — still show as added
+      setAdded(true);
+    } finally {
+      setAdding(false);
+    }
+  };
 
   // Fetch streak, word of day, and initial leaderboard on mount
   useEffect(() => {
@@ -191,11 +209,15 @@ export const RightSidebar = () => {
           </div>
         )}
 
-        <button className="mt-5 w-full py-2.5 rounded-lg bg-white text-primary text-sm font-bold hover:bg-secondary hover:text-primary transition">
-          Add to My List →
+        <button
+           onClick={handleAddToList}
+           disabled={adding || added}
+           className="mt-5 w-full py-2.5 rounded-lg bg-white text-primary text-sm font-bold hover:bg-secondary hover:text-primary transition disabled:opacity-60">
+          {added ? 'Added to My List ✓' : adding ? 'Adding...' : 'Add to My List →'}
         </button>
       </div>
-
+      {/* Achievements */}
+      <Badges compact />
     </aside>
   );
 };

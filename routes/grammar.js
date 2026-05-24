@@ -16,6 +16,7 @@ const express = require('express');
 const router = express.Router();
 const { getDb } = require('../database/database');
 const { requireAuth } = require('../middleware/auth');
+const { evaluateAndAwardBadges } = require('../services/badgeEngine');
 
 // =================== get topics ==================
 // Returns all grammar topics, filtered by curriculum if provided
@@ -129,7 +130,27 @@ router.post('/answer', requireAuth, (req, res) => {
   const is_correct = answer.toString().trim().toUpperCase() ===
     question.correct_answer.toString().trim().toUpperCase() ? 1 : 0;
 
-  const xp_earned = is_correct ? question.xp_reward : 0;
+  const previousCorrect = db.prepare(`
+     SELECT id from attempts
+     WHERE user.id = ? AND question_id = ? AND is_correct = 1
+  `).get(req.user.id, question_id);
+
+  // award only if this is the first attempt
+  const xp_earned = (is_correct && !previousCorrect) ? question.xp_reward : 0;
+
+  // Evaluate badges after every answer
+  const newBadges = evaluateAndAwardBadges(req.user.id);
+
+  res.json({
+    is_correct: is_correct === 1,
+    correct_answer: question.correct_answer,
+    explanation: question.explanation,
+    xp_earned,
+    new_xp,
+    new_level,
+    levelled_up,
+    new_badges: newBadges  
+  });
 
   // Log the attempt
   db.prepare(`
@@ -138,7 +159,7 @@ router.post('/answer', requireAuth, (req, res) => {
     VALUES (?, ?, 'grammar', ?, ?, ?, ?)
   `).run(req.user.id, question_id, answer.toString(), is_correct, time_taken_ms || null, xp_earned);
 
-  // Award XP if correct
+  // Award XP  correct attempt
   let new_xp = req.user.xp_total;
   let new_level = req.user.level;
   let levelled_up = false;
@@ -239,18 +260,24 @@ router.get('/progress', requireAuth, (req, res) => {
   `).get(req.user.id);
 
   const topicBreakdown = db.prepare(`
-    SELECT 
-      t.title as topic,
-      COUNT(a.id) as attempts,
-      SUM(a.is_correct) as correct,
-      ROUND(SUM(a.is_correct) * 100.0 / COUNT(a.id), 1) as accuracy_pct
-    FROM attempts a
-    JOIN questions q ON a.question_id = q.id
-    JOIN topics t ON q.topic_id = t.id
-    WHERE a.user_id = ? AND a.module_slug = 'grammar'
-    GROUP BY t.id
-    ORDER BY accuracy_pct ASC
-  `).all(req.user.id);
+  SELECT
+    t.title as topic,
+    t.id as topic_id,
+    COUNT(a.id) as attempts,
+    SUM(a.is_correct) as correct,
+    ROUND(SUM(a.is_correct) * 100.0 / COUNT(a.id), 1) as accuracy_pct
+  FROM attempts a
+  JOIN questions q ON a.question_id = q.id
+  JOIN topics t ON q.topic_id = t.id
+  WHERE a.user_id = ?
+    AND a.module_slug = 'grammar'
+    AND a.is_correct IS NOT NULL
+  GROUP BY t.id
+  HAVING attempts >= 3
+    AND accuracy_pct < 70
+  ORDER BY accuracy_pct ASC
+  LIMIT 5
+`).all(req.user.id);
 
   res.json({ progress, topic_breakdown: topicBreakdown });
 });

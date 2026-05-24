@@ -2,7 +2,6 @@ import { Sidebar } from "@/components/ngala/Sidebar";
 import { StatsBar } from "@/components/ngala/StatsBar";
 import { LevelProgress } from "@/components/ngala/LevelProgress";
 import { ModuleCards } from "@/components/ngala/ModuleCards";
-import { Badges } from "@/components/ngala/Badges";
 import { WeakAreas } from "@/components/ngala/WeakAreas";
 import { RightSidebar } from "@/components/ngala/RightSidebar";
 import { useAuth } from "@/context/AuthContext";
@@ -42,7 +41,7 @@ const Index = () => {
               <StatsBar />
               <LevelProgress />
               <ModuleCards dashboard={dashboard} />
-              <Badges />
+              
               <WeakAreas topics={dashboard.grammarWeakTopics} loading={dashboard.loading} />
             </div>
 
