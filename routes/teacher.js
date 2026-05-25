@@ -143,7 +143,8 @@ router.get('/weak-topics', requireTeacher, (req, res) => {
 
   query += `
     GROUP BY t.id
-    HAVING total_attempts >= 5
+    HAVING accuracy_pct < 70
+      AND total_attempts >= 3
     ORDER BY accuracy_pct ASC
     LIMIT 10
   `;

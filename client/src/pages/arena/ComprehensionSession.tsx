@@ -46,23 +46,27 @@ const ComprehensionSession = () => {
   };
 
   const handleConfirm = async () => {
-    if (!selected || !sessionId) return;
-    const q = questions[idx];
-    try {
-      const res = await api.comprehension.submitAnswer({
-        passage_question_id: q.id,
-        answer: selected,
-        session_id: sessionId,
-        time_taken_ms: seconds * 1000,
-      });
-      setCorrectAnswer(res.correct_answer);
-      setExplanation(res.explanation);
-    } catch {
-      setCorrectAnswer(q.correct_answer);
-      setExplanation(q.explanation ?? '');
-    }
-    setConfirmed(true);
-  };
+  if (!selected || !sessionId) return;
+  const q = questions[idx];
+  
+  // Find letter for selected option
+  const selectedLetter = String.fromCharCode(65 + q.options.indexOf(selected));
+  
+  try {
+    const res = await api.comprehension.submitAnswer({
+      passage_question_id: q.id,
+      answer: selectedLetter,  // ← send "B" not full text
+      session_id: sessionId,
+      time_taken_ms: seconds * 1000,
+    });
+    setCorrectAnswer(res.correct_answer); // backend returns "B"
+    setExplanation(res.explanation);
+  } catch {
+    setCorrectAnswer(q.correct_answer);
+    setExplanation(q.explanation ?? '');
+  }
+  setConfirmed(true);
+};
 
   const handleNext = async () => {
     if (idx + 1 >= questions.length) {
@@ -143,7 +147,8 @@ const ComprehensionSession = () => {
                 {q.options.map((opt, i) => {
                   const letter = String.fromCharCode(65 + i);
                   const isSel = selected === opt;
-                  const isCorrect = confirmed && opt === correctAnswer;
+                  const isCorrect = confirmed && letter === correctAnswer;
+                  const isWrong = confirmed && isSel && !isCorrect;
                   let cls = "border-border hover:border-primary/40 hover:bg-primary/5";
                   if (!confirmed && isSel) cls = "border-primary bg-primary/10";
                   if (confirmed) {

@@ -36,11 +36,7 @@ const Login = () => {
 
         {/* Logo */}
         <div className="flex items-center justify-center gap-3 mb-8">
-          <img 
-            src="/logo.jpeg" 
-            alt="Ngala English Hub Logo"
-            className="w-12 h-12 object-contain"
-          />
+          
           <div>
             <div className="text-2xl font-extrabold text-primary tracking-tight">Ngala</div>
             <div className="text-[11px] font-bold text-secondary uppercase tracking-widest">English Hub</div>

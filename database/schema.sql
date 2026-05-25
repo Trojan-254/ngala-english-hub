@@ -60,7 +60,7 @@ CREATE TABLE IF NOT EXISTS questions (
   question_text  TEXT NOT NULL,
   question_type  TEXT NOT NULL,                -- 'mcq' | 'fill_blank' | 'reorder'
   options        TEXT,                         -- JSON array: ["A","B","C","D"]
-  correct_answer TEXT NOT NULL,                -- "A" or index or exact text
+  correct_answer TEXT,                -- "A" or index or exact text
   explanation    TEXT NOT NULL,                -- WHY the answer is correct - critical for learning
   xp_reward      INTEGER NOT NULL DEFAULT 10,
   difficulty     INTEGER NOT NULL DEFAULT 1,

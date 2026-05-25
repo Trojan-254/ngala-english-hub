@@ -423,6 +423,15 @@ router.post('/past-papers/:id/questions', requireTeacher, (req, res) => {
     topic = { id: t.lastInsertRowid };
   }
 
+  // Set explanation based on question type
+  let finalExplanation = null;
+  if (question_type === 'mcq') {
+    finalExplanation = explanation || 'No explanation provided';
+  } else {
+    // For non-MCQ questions, use the model answer as explanation
+    finalExplanation = correct_answer || 'Model answer — teacher will review';
+  }
+
   const result = db.prepare(`
     INSERT INTO questions
       (topic_id, past_paper_id, question_text, question_type, options,
@@ -436,7 +445,7 @@ router.post('/past-papers/:id/questions', requireTeacher, (req, res) => {
     question_type,
     options ? JSON.stringify(options) : null,
     correct_answer || null,
-    explanation || null,
+    finalExplanation,
     xp_reward || 20,
     difficulty || 2,
     source || paper.title,
@@ -445,7 +454,8 @@ router.post('/past-papers/:id/questions', requireTeacher, (req, res) => {
 
   res.status(201).json({
     id: result.lastInsertRowid,
-    message: 'Question added to past paper'
+    message: 'Question added to past paper',
+    explanation: finalExplanation // Return the explanation to confirm
   });
 });
 

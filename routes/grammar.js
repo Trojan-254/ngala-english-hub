@@ -25,15 +25,19 @@ router.get('/topics', requireAuth, (req, res) => {
   const { curriculum } = req.query;
 
   let query = `
-    SELECT t.*, 
-      COUNT(q.id) as question_count
+    SELECT t.*,
+      COUNT(DISTINCT q.id) as question_count,
+      COUNT(DISTINCT a.id) as attempt_count,
+      ROUND(SUM(CASE WHEN a.is_correct = 1 THEN 1 ELSE 0 END) * 100.0 / NULLIF(COUNT(a.id), 0), 1) as my_accuracy
     FROM topics t
     LEFT JOIN questions q ON q.topic_id = t.id AND q.is_active = 1
+    LEFT JOIN attempts a ON a.question_id = q.id AND a.user_id = ?
     WHERE t.module_id = (SELECT id FROM modules WHERE slug = 'grammar')
       AND t.is_active = 1
   `;
 
-  const params = [];
+  const params = [req.user.id];
+
   if (curriculum) {
     query += ` AND (t.curriculum = ? OR t.curriculum = 'both')`;
     params.push(curriculum);

@@ -56,19 +56,38 @@ router.post('/session/start', requireAuth, (req, res) => {
   let words;
 
   if (topic_id) {
-    // Get topic title to match topic_tag
-    const topic = db.prepare(`SELECT title FROM topics WHERE id = ?`).get(topic_id);
+    // Get topic to find its title — vocabulary uses topic_tag which matches topic title
+    const topic = db.prepare(`SELECT * FROM topics WHERE id = ?`).get(topic_id);
 
-    words = db.prepare(`
-      SELECT v.*
-      FROM vocabulary v
-      WHERE v.topic_tag = ?
-        AND v.is_active = 1
-      ORDER BY RANDOM()
-      LIMIT ?
-    `).all(topic?.title || '', Math.min(limit, 20));
+    if (topic) {
+      // Try matching by topic_tag first, then fall back to any words
+      words = db.prepare(`
+        SELECT v.*
+        FROM vocabulary v
+        WHERE v.is_active = 1
+          AND (v.topic_tag = ? OR v.topic_tag LIKE ?)
+        ORDER BY RANDOM()
+        LIMIT ?
+      `).all(topic.title.toLowerCase(), `%${topic.title.toLowerCase().split(' ')[0]}%`, Math.min(limit, 20));
+    }
+
+    // If no words matched the topic, fall back to all available words
+    if (!words || words.length === 0) {
+      words = db.prepare(`
+        SELECT v.*
+        FROM vocabulary v
+        WHERE v.is_active = 1
+          AND (
+            v.id NOT IN (
+              SELECT vocab_id FROM vocab_reviews
+              WHERE user_id = ? AND next_review > date('now')
+            )
+          )
+        ORDER BY RANDOM()
+        LIMIT ?
+      `).all(req.user.id, Math.min(limit, 20));
+    }
   } else {
-    // Get due words or fresh words
     words = db.prepare(`
       SELECT v.*
       FROM vocabulary v
@@ -87,7 +106,7 @@ router.post('/session/start', requireAuth, (req, res) => {
     `).all(req.user.id, req.user.id, Math.min(limit, 20));
   }
 
-  if (words.length === 0) {
+  if (!words || words.length === 0) {
     return res.status(404).json({
       error: 'No words available. Your teacher may need to add vocabulary words.'
     });
@@ -98,11 +117,9 @@ router.post('/session/start', requireAuth, (req, res) => {
     VALUES (?, 'vocabulary', ?, ?)
   `).run(req.user.id, topic_id || null, words.length);
 
-  res.json({
-    session_id: session.lastInsertRowid,
-    words
-  });
+  res.json({ session_id: session.lastInsertRowid, words });
 });
+     
 
 // SUBMIT a vocabulary rating (SM-2 algorithm)
 router.post('/rate', requireAuth, (req, res) => {
