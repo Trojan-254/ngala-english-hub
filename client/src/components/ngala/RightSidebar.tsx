@@ -27,6 +27,30 @@ const rankColor = (r: number) =>
   : r === 3 ? "text-warm-orange"
   : "text-foreground";
 
+// Helper to get current week days starting from Monday
+const getCurrentWeekDays = () => {
+  const today = new Date();
+  const currentDay = today.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+  
+  // Adjust to make Monday the first day of week
+  const daysToMonday = currentDay === 0 ? 6 : currentDay - 1;
+  const monday = new Date(today);
+  monday.setDate(today.getDate() - daysToMonday);
+  
+  const weekDays = [];
+  for (let i = 0; i < 7; i++) {
+    const date = new Date(monday);
+    date.setDate(monday.getDate() + i);
+    weekDays.push({
+      label: date.toLocaleDateString('en-US', { weekday: 'short' }).charAt(0),
+      fullLabel: date.toLocaleDateString('en-US', { weekday: 'short' }),
+      date: date.toISOString().split('T')[0],
+      isToday: date.toDateString() === today.toDateString(),
+    });
+  }
+  return weekDays;
+};
+
 export const RightSidebar = () => {
   const { leaderboard: socketLeaderboard } = useSocket();
   const { user } = useAuth();
@@ -55,20 +79,38 @@ export const RightSidebar = () => {
 
   // Fetch streak, word of day, and initial leaderboard on mount
   useEffect(() => {
-    api.misc.streak()
-      .then(res => {
-        setStreakDays(res.days);
-        setStreak(res.streak);
-      })
-      .catch(console.error);
-
-    api.misc.wordOfDay()
-      .then(res => setWordOfDay(res.word))
-      .catch(console.error);
-
-    api.misc.weeklyLeaderboard()
-      .then(res => {
-        const entries = res.leaderboard.slice(0, 5).map((l, i) => ({
+    const fetchData = async () => {
+      try {
+        const [streakRes, wordRes, leaderboardRes] = await Promise.all([
+          api.misc.streak(),
+          api.misc.wordOfDay(),
+          api.misc.weeklyLeaderboard()
+        ]);
+        
+        // Get current week days
+        const currentWeek = getCurrentWeekDays();
+        
+        // Map backend streak days to current week days
+        const mappedStreakDays = currentWeek.map(weekDay => {
+          // Find if there's a streak day entry for this date
+          const streakEntry = streakRes.days.find(
+            (day: StreakDay) => day.date === weekDay.date
+          );
+          
+          return {
+            label: weekDay.label,
+            date: weekDay.date,
+            done: streakEntry?.done || false,
+            today: weekDay.isToday,
+            future: new Date(weekDay.date) > new Date()
+          };
+        });
+        
+        setStreakDays(mappedStreakDays);
+        setStreak(streakRes.streak);
+        setWordOfDay(wordRes.word);
+        
+        const entries = leaderboardRes.leaderboard.slice(0, 5).map((l, i) => ({
           rank: i + 1,
           name: l.display_name,
           xp: l.weekly_xp,
@@ -76,8 +118,12 @@ export const RightSidebar = () => {
           me: l.display_name === user?.display_name
         }));
         setRestLeaderboard(entries);
-      })
-      .catch(console.error);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+    
+    fetchData();
   }, [user]);
 
   // Socket leaderboard overrides REST once live data arrives
@@ -103,13 +149,18 @@ export const RightSidebar = () => {
           {streakDays.length > 0 ? streakDays.map((day, i) => (
             <div key={i} className="flex flex-col items-center gap-1.5">
               <div className={[
-                "w-9 h-9 rounded-full flex items-center justify-center text-xs",
-                day.done ? "bg-success text-success-foreground" : "bg-muted text-muted-foreground",
-                day.today ? "ring-4 ring-secondary/60" : "",
+                "w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold transition-all",
+                day.done 
+                  ? "bg-success text-success-foreground" 
+                  : "bg-muted text-muted-foreground",
+                day.today && !day.done ? "ring-2 ring-secondary ring-offset-2 ring-offset-card" : "",
+                day.today && day.done ? "ring-2 ring-secondary ring-offset-2 ring-offset-card" : "",
               ].join(" ")}>
-                {day.done ? <Check className="w-4 h-4" strokeWidth={3} /> : ""}
+                {day.done ? <Check className="w-4 h-4" strokeWidth={3} /> : day.label}
               </div>
-              <div className="text-[11px] font-semibold text-muted-foreground">{day.label}</div>
+              {/* <div className="text-[11px] font-semibold text-muted-foreground">
+                {day.label}
+              </div> */}
             </div>
           )) : (
             // Skeleton while loading

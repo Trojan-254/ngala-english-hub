@@ -176,6 +176,8 @@ export const contentApi = {
   // Topics
   getTopics: (module_slug?: string) =>
     request<{ topics: Topic[] }>(`/topics${qs({ module_slug })}`),
+  getGrammarTopics: () =>
+    request<{ topics: Topic[] }>('/topics?module_slug=grammar'),
   createTopic: (payload: { module_slug: string; title: string; description?: string; curriculum: string; difficulty: number }) =>
     request<{ id: number; message: string }>('/topics', 'POST', payload),
   updateTopic: (id: number, payload: Partial<Topic>) =>

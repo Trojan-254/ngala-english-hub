@@ -86,10 +86,22 @@ router.post('/session/start', requireAuth, (req, res) => {
   }
 
   // Parse options JSON for each question
-  const parsed = questions.map(q => ({
-    ...q,
-    options: q.options ? JSON.parse(q.options) : []
-  }));
+  const parsed = questions.map(q => {
+  let options = [];
+  if (q.options) {
+    try {
+      options = JSON.parse(q.options);
+    } catch {
+      try {
+        options = JSON.parse(q.options.replace(/\\"/g, '"'));
+      } catch {
+        // Last resort — split by comma if still failing
+        options = q.options.replace(/[\[\]"]/g, '').split(',').map(o => o.trim());
+      }
+    }
+  }
+    return { ...q, options };
+  });
 
   // Create quiz session record
   const session = db.prepare(`
@@ -135,26 +147,12 @@ router.post('/answer', requireAuth, (req, res) => {
     question.correct_answer.toString().trim().toUpperCase() ? 1 : 0;
 
   const previousCorrect = db.prepare(`
-     SELECT id from attempts
-     WHERE user.id = ? AND question_id = ? AND is_correct = 1
+    SELECT id FROM attempts
+    WHERE user_id = ? AND question_id = ? AND is_correct = 1
   `).get(req.user.id, question_id);
 
   // award only if this is the first attempt
   const xp_earned = (is_correct && !previousCorrect) ? question.xp_reward : 0;
-
-  // Evaluate badges after every answer
-  const newBadges = evaluateAndAwardBadges(req.user.id);
-
-  res.json({
-    is_correct: is_correct === 1,
-    correct_answer: question.correct_answer,
-    explanation: question.explanation,
-    xp_earned,
-    new_xp,
-    new_level,
-    levelled_up,
-    new_badges: newBadges  
-  });
 
   // Log the attempt
   db.prepare(`
@@ -163,7 +161,7 @@ router.post('/answer', requireAuth, (req, res) => {
     VALUES (?, ?, 'grammar', ?, ?, ?, ?)
   `).run(req.user.id, question_id, answer.toString(), is_correct, time_taken_ms || null, xp_earned);
 
-  // Award XP  correct attempt
+  // Award XP for correct attempt
   let new_xp = req.user.xp_total;
   let new_level = req.user.level;
   let levelled_up = false;
@@ -197,6 +195,9 @@ router.post('/answer', requireAuth, (req, res) => {
     WHERE id = ?
   `).run(is_correct, xp_earned, session_id);
 
+  // Evaluate badges after every answer
+  const newBadges = evaluateAndAwardBadges(req.user.id);
+
   // Emit leaderboard update via Socket.io
   const io = req.app.get('io');
   if (io && req.user.class_group) {
@@ -215,7 +216,8 @@ router.post('/answer', requireAuth, (req, res) => {
     xp_earned,
     new_xp,
     new_level,
-    levelled_up
+    levelled_up,
+    new_badges: newBadges  
   });
 });
 

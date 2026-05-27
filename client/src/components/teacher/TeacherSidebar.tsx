@@ -17,6 +17,8 @@ export default function TeacherSidebar() {
     logout();
     navigate("/");
   };
+  const currentYear = new Date().getFullYear();
+
   return (
     <aside
       style={{
@@ -99,6 +101,10 @@ export default function TeacherSidebar() {
         <LogOut size={16} />
         Logout
       </button>
+
+      <div className="px-6 py-5 text-[11px] text-white/40">
+        Powered by Katana Ngala Senior School @{currentYear}
+      </div>
     </aside>
   );
 }

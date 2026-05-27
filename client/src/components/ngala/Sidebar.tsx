@@ -9,9 +9,11 @@ import {
   User,
   Menu,
   X,
+  LogOut,
 } from "lucide-react";
 import { useState, useEffect } from "react";
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "@/context/AuthContext";
 
 const navItems = [
   { icon: Home, label: "Dashboard", to: "/dashboard" },
@@ -23,9 +25,39 @@ const navItems = [
   { icon: User, label: "My Progress", to: "/progress" },
 ];
 
+const LEVEL_NAMES = ["Apprentice", "Apprentice", "Scribe", "Wordsmith", "Scholar", "Griot"];
+
+// Helper function to get level name based on level number
+const getLevelName = (level) => {
+  // If level is a number (0-5)
+  if (typeof level === 'number' && level >= 0 && level < LEVEL_NAMES.length) {
+    return LEVEL_NAMES[level];
+  }
+  // If level is a string like "Level 2", extract the number
+  if (typeof level === 'string') {
+    const match = level.match(/\d+/);
+    if (match) {
+      const levelNum = parseInt(match[0]);
+      if (levelNum >= 0 && levelNum < LEVEL_NAMES.length) {
+        return LEVEL_NAMES[levelNum];
+      }
+    }
+  }
+  return "";
+};
+
 export const Sidebar = () => {
   const [open, setOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
+  
+  const currentYear = new Date().getFullYear();
+
+  const handleLogout = async () => {
+    await logout();
+    navigate("/login");
+  };
 
   // Close drawer on resize to desktop
   useEffect(() => {
@@ -71,10 +103,12 @@ export const Sidebar = () => {
             JO
           </div>
           <div className="min-w-0">
-            <div className="font-bold text-sm truncate">John Otieno</div>
-            <span className="inline-block mt-1 px-2 py-0.5 rounded-full bg-secondary/15 text-secondary text-[10px] font-bold tracking-wide">
-              Lv.3 · Wordsmith
-            </span>
+            <div className="font-bold text-sm truncate">{user?.display_name}</div>
+            <div className="flex flex-col gap-0.5 mt-0.5">
+              <span className="inline-block px-2 py-0.5 rounded-full bg-secondary/15 text-secondary text-[10px] font-bold tracking-wide">
+                {user?.level} {getLevelName(user?.level) && `- ${getLevelName(user?.level)}`}
+              </span>
+            </div>
           </div>
         </div>
       </div>
@@ -104,8 +138,27 @@ export const Sidebar = () => {
         </ul>
       </nav>
 
+      {/* Logout Button */}
+      <div className="px-3 pb-4">
+       <button
+        onClick={handleLogout}
+        style={{
+          margin: "8px 12px 20px",
+          display: "flex", alignItems: "center", gap: 10,
+          padding: "5px 50px", borderRadius: 6,
+          background: "transparent", color: "#fff",
+          border: "1px solid rgba(255,255,255,0.15)",
+          fontSize: 13, fontWeight: 500, cursor: "pointer",
+          fontFamily: "inherit",
+        }}
+      >
+        <LogOut size={16} />
+        Logout
+      </button>
+      </div>
+
       <div className="px-6 py-5 text-[11px] text-white/40">
-        Powered by Pwani University TP 2026
+        Powered by Katana Ngala Senior School @{currentYear}
       </div>
     </>
   );

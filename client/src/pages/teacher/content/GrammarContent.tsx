@@ -29,6 +29,12 @@ export default function GrammarContent() {
   const [curriculum, setCurriculum] = useState<Curriculum>("both");
   const [source, setSource] = useState("");
   const [addedCount, setAddedCount] = useState(0);
+  const [showTopicForm, setShowTopicForm] = useState(false);
+  const [newTopicTitle, setNewTopicTitle] = useState("");
+  const [newTopicDesc, setNewTopicDesc] = useState("");
+  const [newTopicDifficulty, setNewTopicDifficulty] = useState<Difficulty>(1);
+  const [newTopicCurriculum, setNewTopicCurriculum] = useState<Curriculum>("both");
+  const [savingTopic, setSavingTopic] = useState(false);
   useEffect(() => { loadTopics(); }, []);
   async function loadTopics() {
     try {
@@ -38,6 +44,36 @@ export default function GrammarContent() {
     } catch (e) {
       setTopicsError((e as Error).message);
       setTopics([]);
+    }
+  }
+  async function handleCreateTopic() {
+    if (!newTopicTitle.trim()) { toast.error("Topic title is required"); return; }
+    setSavingTopic(true);
+    try {
+      const result = await contentApi.createTopic({
+        module_slug: "grammar",
+        title: newTopicTitle.trim(),
+        description: newTopicDesc.trim() || undefined,
+        curriculum: newTopicCurriculum,
+        difficulty: newTopicDifficulty,
+      });
+      toast.success("Topic created");
+      setShowTopicForm(false);
+      setNewTopicTitle("");
+      setNewTopicDesc("");
+      setNewTopicDifficulty(1);
+      setNewTopicCurriculum("both");
+      await loadTopics();
+      // Auto-select the new topic
+      if (topics) {
+        const fresh = await contentApi.getTopics("grammar");
+        const created = fresh.topics.find(t => t.id === result.id);
+        if (created) selectTopic(created);
+      }
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally {
+      setSavingTopic(false);
     }
   }
   async function loadQuestions(t: Topic) {
@@ -144,47 +180,159 @@ export default function GrammarContent() {
       </p>
       <div style={{ display: "grid", gridTemplateColumns: "280px 1fr", gap: 20, marginTop: 24, alignItems: "start" }}>
         <aside style={{ ...cardStyle, padding: 12, maxHeight: "calc(100vh - 180px)", overflowY: "auto" }}>
-          <div style={{ fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: 0.6, color: T.textMuted, padding: "4px 8px 10px" }}>
-            Topics
-          </div>
-          {topicsError && <ErrorState message={topicsError} onRetry={loadTopics} />}
-          {!topics && !topicsError && (
-            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-              {Array.from({ length: 6 }).map((_, i) => <SkeletonBlock key={i} height={48} />)}
-            </div>
+  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "4px 8px 10px" }}>
+    <div style={{ fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: 0.6, color: T.textMuted }}>
+      Topics
+    </div>
+    <button
+      onClick={() => setShowTopicForm(v => !v)}
+      style={{
+        display: "flex", alignItems: "center", gap: 4,
+        padding: "4px 8px", background: T.primary, color: "#fff",
+        border: "none", borderRadius: 6, fontSize: 11, fontWeight: 700,
+        cursor: "pointer", fontFamily: "inherit",
+      }}
+    >
+      <Plus size={12} /> New Topic
+    </button>
+  </div>
+
+  {/* Inline topic creation form */}
+  {showTopicForm && (
+    <div style={{
+      margin: "0 0 12px 0", padding: 12,
+      background: T.primaryLight, borderRadius: 8,
+      border: `1px solid ${T.primary}30`,
+      display: "flex", flexDirection: "column", gap: 8,
+    }}>
+      <div style={{ fontSize: 12, fontWeight: 700, color: T.primary }}>New Topic</div>
+      <input
+        placeholder="Topic title *"
+        value={newTopicTitle}
+        onChange={e => setNewTopicTitle(e.target.value)}
+        style={{
+          width: "100%", padding: "8px 10px",
+          border: `1px solid ${T.border}`, borderRadius: 6,
+          fontSize: 12, fontFamily: "inherit", boxSizing: "border-box",
+          outline: "none",
+        }}
+        autoFocus
+      />
+      <input
+        placeholder="Description (optional)"
+        value={newTopicDesc}
+        onChange={e => setNewTopicDesc(e.target.value)}
+        style={{
+          width: "100%", padding: "8px 10px",
+          border: `1px solid ${T.border}`, borderRadius: 6,
+          fontSize: 12, fontFamily: "inherit", boxSizing: "border-box",
+          outline: "none",
+        }}
+      />
+      <div style={{ display: "flex", gap: 6 }}>
+        {([1, 2, 3] as Difficulty[]).map(d => (
+          <button
+            key={d}
+            onClick={() => setNewTopicDifficulty(d)}
+            style={{
+              flex: 1, padding: "5px 0", border: "none", borderRadius: 6,
+              fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "inherit",
+              background: newTopicDifficulty === d
+                ? d === 1 ? T.green : d === 2 ? T.gold : T.red
+                : T.border,
+              color: newTopicDifficulty === d ? "#fff" : T.textSecondary,
+            }}
+          >
+            {d === 1 ? "Easy" : d === 2 ? "Medium" : "Hard"}
+          </button>
+        ))}
+      </div>
+      <div style={{ display: "flex", gap: 6 }}>
+        {(["both", "844", "CBE"] as Curriculum[]).map(c => (
+          <button
+            key={c}
+            onClick={() => setNewTopicCurriculum(c)}
+            style={{
+              flex: 1, padding: "5px 0", border: "none", borderRadius: 6,
+              fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "inherit",
+              background: newTopicCurriculum === c ? T.primary : T.border,
+              color: newTopicCurriculum === c ? "#fff" : T.textSecondary,
+            }}
+          >
+            {c === "both" ? "Both" : c}
+          </button>
+        ))}
+      </div>
+      <div style={{ display: "flex", gap: 6 }}>
+        <button
+          onClick={handleCreateTopic}
+          disabled={savingTopic || !newTopicTitle.trim()}
+          style={{
+            flex: 1, padding: "8px 0", background: T.primary, color: "#fff",
+            border: "none", borderRadius: 6, fontSize: 12, fontWeight: 700,
+            cursor: savingTopic || !newTopicTitle.trim() ? "not-allowed" : "pointer",
+            opacity: savingTopic || !newTopicTitle.trim() ? 0.6 : 1,
+            fontFamily: "inherit",
+          }}
+        >
+          {savingTopic ? "Creating..." : "Create Topic"}
+        </button>
+        <button
+          onClick={() => { setShowTopicForm(false); setNewTopicTitle(""); setNewTopicDesc(""); }}
+          style={{
+            padding: "8px 12px", background: "transparent",
+            border: `1px solid ${T.border}`, borderRadius: 6,
+            fontSize: 12, cursor: "pointer", fontFamily: "inherit", color: T.textSecondary,
+          }}
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  )}
+
+  {topicsError && <ErrorState message={topicsError} onRetry={loadTopics} />}
+  {!topics && !topicsError && (
+    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+      {Array.from({ length: 6 }).map((_, i) => <SkeletonBlock key={i} height={48} />)}
+    </div>
+  )}
+  {topics && topics.length === 0 && !topicsError && (
+    <div style={{ fontSize: 13, color: T.textSecondary, padding: 12 }}>
+      No topics yet. Create your first topic above.
+    </div>
+  )}
+  {topics?.map((t) => {
+    const active = activeTopic?.id === t.id;
+    return (
+      <button
+        key={t.id}
+        onClick={() => selectTopic(t)}
+        style={{
+          width: "100%", textAlign: "left", padding: "10px 12px",
+          borderRadius: 8, marginBottom: 4, cursor: "pointer",
+          background: active ? T.primaryLight : "transparent",
+          border: "none", borderLeftWidth: 3, borderLeftStyle: "solid",
+          borderLeftColor: active ? T.primary : "transparent",
+          fontFamily: "inherit",
+        }}
+      >
+        <div style={{ fontWeight: 600, fontSize: 13, color: T.textPrimary }}>{t.title}</div>
+        <div style={{ display: "flex", gap: 6, marginTop: 4, alignItems: "center" }}>
+          {difficultyPill(t.difficulty)}
+          {t.question_count !== undefined && (
+            <span style={{
+              background: T.primaryLight, color: T.primary,
+              fontSize: 10, fontWeight: 700, padding: "2px 7px", borderRadius: 999,
+            }}>
+              {t.question_count} Qs
+            </span>
           )}
-          {topics && topics.length === 0 && !topicsError && (
-            <div style={{ fontSize: 13, color: T.textSecondary, padding: 12 }}>No grammar topics found.</div>
-          )}
-          {topics?.map((t) => {
-            const active = activeTopic?.id === t.id;
-            return (
-              <button
-                key={t.id}
-                onClick={() => selectTopic(t)}
-                style={{
-                  width: "100%", textAlign: "left", padding: "10px 12px",
-                  borderRadius: 8, marginBottom: 4, cursor: "pointer",
-                  background: active ? T.primaryLight : "transparent",
-                  borderLeft: `3px solid ${active ? T.primary : "transparent"}`,
-                  border: "none", borderLeftWidth: 3, borderLeftStyle: "solid",
-                  borderLeftColor: active ? T.primary : "transparent",
-                  fontFamily: "inherit",
-                }}
-              >
-                <div style={{ fontWeight: 600, fontSize: 13, color: T.textPrimary }}>{t.title}</div>
-                <div style={{ display: "flex", gap: 6, marginTop: 4, alignItems: "center" }}>
-                  {difficultyPill(t.difficulty)}
-                  {t.question_count !== undefined && (
-                    <span style={{ background: T.primaryLight, color: T.primary, fontSize: 10, fontWeight: 700, padding: "2px 7px", borderRadius: 999 }}>
-                      {t.question_count} Qs
-                    </span>
-                  )}
-                </div>
-              </button>
-            );
-          })}
-        </aside>
+        </div>
+      </button>
+    );
+  })}
+</aside>
         <section>
           {!activeTopic && (
             <EmptyState title="Select a topic" description="Select a topic from the left to view and add questions." />
