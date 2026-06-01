@@ -1,0 +1,19 @@
+# render.yaml
+services:
+  - type: web
+    name: ngala-english-hub-api
+    runtime: node
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: NODE_VERSION
+        value: 18.17.0
+      - key: TURSO_DATABASE_URL
+        sync: false
+      - key: TURSO_AUTH_TOKEN
+        sync: false
+      - key: FRONTEND_URL
+        value: https://ngala-english-hub.vercel.app
+      - key: PORT
+        value: 10000
+    plan: free

@@ -22,8 +22,11 @@
   },
   "homepage": "https://github.com/Trojan-254/ngala-english-hub#readme",
   "dependencies": {
+    "@libsql/client": "^0.17.3",
     "bcrypt": "^6.0.0",
     "better-sqlite3": "^12.9.0",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "fs": "^0.0.1-security",
     "socket.io": "^4.8.3",

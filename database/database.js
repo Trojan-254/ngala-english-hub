@@ -1,99 +1,65 @@
-const Database = require('better-sqlite3');
-const fs = require('fs');
+// database/database.js
 const path = require('path');
+require('dotenv').config();
 
-const DB_PATH = path.join(__dirname, 'ngala.db');
-const SCHEMA_PATH = path.join(__dirname, 'schema.sql');
+let db = null;
 
-let db;
-
-function splitSql(sql) {
-  const statements = [];
-  let current = '';
-  let inString = false;
-  let stringChar = '';
-
-  for (let i = 0; i < sql.length; i++) {
-    const char = sql[i];
-    const prev = sql[i - 1];
-
-    if (inString) {
-      current += char;
-      // End of string — but not an escaped quote or a doubled quote
-      if (char === stringChar && prev !== '\\') {
-        // Check next char — if also a quote, it's a doubled quote escape, stay in string
-        if (sql[i + 1] === stringChar) {
-          current += sql[i + 1];
-          i++; // skip next quote
-        } else {
-          inString = false;
+async function initializeDatabase() {
+  if (db) return db;
+  
+  // Check if we're using Turso (production)
+  if (process.env.TURSO_DATABASE_URL && process.env.TURSO_AUTH_TOKEN) {
+    const { createClient } = require('@libsql/client');
+    db = createClient({
+      url: process.env.TURSO_DATABASE_URL,
+      authToken: process.env.TURSO_AUTH_TOKEN,
+    });
+    console.log('✅ Using Turso database');
+    
+    // Initialize schema in Turso if needed
+    const fs = require('fs');
+    const schemaPath = path.join(__dirname, 'schema.sql');
+    if (fs.existsSync(schemaPath)) {
+      const schema = fs.readFileSync(schemaPath, 'utf8');
+      // Split schema by semicolons and execute
+      const statements = schema.split(';').filter(s => s.trim());
+      for (const stmt of statements) {
+        try {
+          await db.execute(stmt);
+        } catch (e) {
+          if (!e.message.includes('already exists')) {
+            console.log('Schema statement error (may be OK):', e.message);
+          }
         }
-      }
-    } else {
-      if (char === "'" || char === '"') {
-        inString = true;
-        stringChar = char;
-        current += char;
-      } else if (char === '-' && sql[i + 1] === '-') {
-        // Line comment — skip to end of line
-        while (i < sql.length && sql[i] !== '\n') i++;
-        current += '\n';
-      } else if (char === '/' && sql[i + 1] === '*') {
-        // Block comment — skip to */
-        i += 2;
-        while (i < sql.length - 1 && !(sql[i] === '*' && sql[i + 1] === '/')) i++;
-        i += 2;
-      } else if (char === ';') {
-        const trimmed = current.trim();
-        if (trimmed.length > 0) {
-          statements.push(trimmed);
-        }
-        current = '';
-      } else {
-        current += char;
       }
     }
+  } else {
+    // Use local better-sqlite3 for development
+    const Database = require('better-sqlite3');
+    const fs = require('fs');
+    const DB_PATH = path.join(__dirname, 'ngala.db');
+    const SCHEMA_PATH = path.join(__dirname, 'schema.sql');
+    
+    db = new Database(DB_PATH);
+    db.pragma('journal_mode = WAL');
+    db.pragma('foreign_keys = ON');
+    
+    // Initialize schema if needed
+    if (fs.existsSync(SCHEMA_PATH)) {
+      const schema = fs.readFileSync(SCHEMA_PATH, 'utf8');
+      db.exec(schema);
+    }
+    console.log('✅ Using local SQLite database');
   }
-
-  const trimmed = current.trim();
-  if (trimmed.length > 0) statements.push(trimmed);
-
-  return statements;
-}
-
-function getDb() {
-  if (db) return db;
-
-  db = new Database(DB_PATH, {
-    verbose: process.env.NODE_ENV === 'development' ? console.log : null
-  });
-
-  db.pragma('journal_mode = WAL');
-  db.pragma('foreign_keys = ON');
-  db.pragma('synchronous = NORMAL');
-  db.pragma('cache_size = -16000');
-  db.pragma('temp_store = MEMORY');
-
-  const schema = fs.readFileSync(SCHEMA_PATH, 'utf8');
-  const statements = splitSql(schema);
-
-  const runAll = db.transaction(() => {
-    statements.forEach((stmt, i) => {
-      try {
-        db.exec(stmt + ';');
-      } catch (e) {
-        if (!e.message.includes('already exists')) {
-          console.error(`Error at statement ${i + 1}:`, e.message);
-          console.error('Statement:', stmt.substring(0, 120));
-          throw e;
-        }
-      }
-    });
-  });
-
-  runAll();
-  console.log('Database ready:', DB_PATH);
+  
   return db;
 }
 
-module.exports = { getDb };
+function getDb() {
+  if (!db) {
+    throw new Error('Database not initialized. Call initializeDatabase() first.');
+  }
+  return db;
+}
+
+module.exports = { getDb, initializeDatabase };
