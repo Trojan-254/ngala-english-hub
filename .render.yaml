@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: ngala-english-hub
+    env: node
+    buildCommand: npm install
+    startCommand: node server.js
+    disk:
+      name: ngala-db
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DB_PATH
+        value: /var/data/ngala.db
+      - key: CORS_ORIGIN
+        value: https://ngala-english-hub.vercel.app

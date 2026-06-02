@@ -2,7 +2,7 @@ const Database = require('better-sqlite3');
 const fs = require('fs');
 const path = require('path');
 
-const DB_PATH = path.join(__dirname, 'ngala.db');
+const DB_PATH = process.env.NODE_ENV === 'production' ? '/var/data/ngala.db' : path.join(__dirname, 'ngala.db');
 const SCHEMA_PATH = path.join(__dirname, 'schema.sql');
 
 let db;

@@ -29,7 +29,7 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!sessionId || !user) return;
 
-    const socket = io('/', {
+    const socket = io(import.meta.env.VITE_SOCKET_URL || '/', {
       reconnectionAttempts: 5,
       reconnectionDelay: 1000,
     });

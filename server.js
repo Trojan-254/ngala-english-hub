@@ -23,8 +23,31 @@ const http = require('http');
 const { Server } = require('socket.io');
 const path = require('path');
 const { getDb } = require('./database/database');
-
+const cors = require('cors');
 const app = express();
+
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+  'https://ngala-english-hub.vercel.app', 
+  'http://localhost:5173',
+  'http://localhost:8080'
+].filter(Boolean);
+
+app.use(cors({
+      origin: function(origin, callback) {
+        // Allow requests with no origin 
+        if (!origin) return callback(null, true);
+        if (allowedOrigins.indexOf(origin) === -1) {
+          const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+          return callback(new Error(msg), false);
+        }
+        return callback(null, true);
+      },
+      credentials: true,
+      methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+      allowedHeaders: ['Content-Type', 'Authorization', 'x-session-id']
+ }));
+
 const server = http.createServer(app);
 const io = new Server(server, {
   pingTimeout: 60000,
@@ -90,6 +113,17 @@ io.on('connection', (socket) => {
 // Make io accessible to route handlers later
 app.set('io', io);
 
+
+app.post('/admin/seed', (req, res) => {
+    if (req.headers['x-admin-key'] !== process.env.ADMIN_KEY) {
+       return res.status(403).json({ error: 'Forbidden' });
+    }
+    // Schema already runs on startup via database.js
+    // Run passage seed
+    require('./database/seed-passage');
+    res.json({ message: 'Seeded' });
+})
+
 // Session cleanup job — runs every hour
 setInterval(() => {
   const stmt = db.prepare(`DELETE FROM sessions WHERE expires_at < datetime('now')`);
@@ -100,6 +134,7 @@ setInterval(() => {
 }, 1000 * 60 * 60);
 
 server.listen(PORT, () => {
-  console.log(`Ngala English Hub running at http://localhost:${PORT}`);
-  console.log(`LAN access: http://<this-machine-ip>:${PORT}`);
+  console.log(`Ngala English Hub running on port: ${PORT}`);
+  console.log(`📍 Backend URL: http://localhost:${PORT}`);
+  //console.log(`LAN access: http://<this-machine-ip>:${PORT}`);
 });
