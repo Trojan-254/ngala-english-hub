@@ -33,20 +33,6 @@ const allowedOrigins = [
   'http://localhost:8080'
 ].filter(Boolean);
 
-app.use(cors({
-  origin: function(origin, callback) {
-    // Allow requests with no origin 
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.indexOf(origin) === -1) {
-      const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
-      return callback(new Error(msg), false);
-    }
-    return callback(null, true);
-  },
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'x-session-id']
-}));
 
 const app = express();
 const server = http.createServer(app);
@@ -80,11 +66,22 @@ async function startServer() {
     const pastPapersRoutes = require('./routes/pastpapers');
     const vocabularyRoutes = require('./routes/vocabulary');
     
-    // Middleware
+    // Middle
     app.use(cors({
-      origin: process.env.FRONTEND_URL || 'http://localhost:5173',
-      credentials: true
+      origin: function(origin, callback) {
+        // Allow requests with no origin 
+        if (!origin) return callback(null, true);
+        if (allowedOrigins.indexOf(origin) === -1) {
+          const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+          return callback(new Error(msg), false);
+        }
+        return callback(null, true);
+      },
+      credentials: true,
+      methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+      allowedHeaders: ['Content-Type', 'Authorization', 'x-session-id']
     }));
+
     app.use(express.json());
     app.use(express.urlencoded({ extended: true }));
     app.use(express.static(path.join(__dirname, 'public')));
