@@ -1,4 +1,4 @@
-const BASE_URL = '/api';
+import { BASE_URL } from './api-config';
 
 function getSessionId(): string | null {
   return localStorage.getItem('sessionId');
@@ -10,6 +10,7 @@ async function request<T>(
     body?: unknown
 ): Promise<T> {
     const sessionId = getSessionId();
+    const baseUrl = BASE_URL;
 
     const headers: Record<string, string> = {
         'Content-Type': 'application/json',
@@ -19,7 +20,7 @@ async function request<T>(
        headers['x-session-id'] = sessionId;
     }
 
-    const response = await fetch(`${BASE_URL}${path}`, {
+    const response = await fetch(`${baseUrl}${path}`, {
       method,
       headers,
       body: body ? JSON.stringify(body) : undefined,

@@ -26,13 +26,35 @@ const { getDb, initializeDatabase } = require('./database/database');
 const cors = require('cors');
 require('dotenv').config();
 
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+  'https://ngala-english-hub.vercel.app', 
+  'http://localhost:5173',
+  'http://localhost:8080'
+].filter(Boolean);
+
+app.use(cors({
+  origin: function(origin, callback) {
+    // Allow requests with no origin 
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) === -1) {
+      const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+      return callback(new Error(msg), false);
+    }
+    return callback(null, true);
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'x-session-id']
+}));
+
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+    origin: allowedOrigins,
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
+    methods: ['GET', 'POST', 'PUT', 'OPTIONS']
   },
   pingTimeout: 60000,
   pingInterval: 25000,

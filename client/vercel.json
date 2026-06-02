@@ -1,0 +1,14 @@
+{
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/"
+    }
+  ],
+  "env": {
+    "VITE_API_URL": "https://ngala-english-hub.onrender.com/"
+  },
+  "buildCommand": "vite build",
+  "outputDirectory": "dist",
+  "framework": "vite"
+}

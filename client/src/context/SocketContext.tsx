@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { useAuth } from './AuthContext';
+import { BASE_URL } from '../lib/api-config';
 
 interface LeaderboardEntry {
   display_name: string;
@@ -29,7 +30,11 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!sessionId || !user) return;
 
-    const socket = io('/', {
+    const socketUrl = BASE_URL.replace('/api', '');
+
+    const socket = io(socketUrl, {
+      transports: ['websocket', 'polling'],
+      withCredentials: true,
       reconnectionAttempts: 5,
       reconnectionDelay: 1000,
     });
