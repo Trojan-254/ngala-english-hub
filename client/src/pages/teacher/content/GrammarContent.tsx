@@ -178,8 +178,8 @@ export default function GrammarContent() {
       <p style={{ color: T.textSecondary, marginTop: 6, fontSize: 14 }}>
         Pick a topic to view and manage its MCQ and open-ended questions.
       </p>
-      <div style={{ display: "grid", gridTemplateColumns: "280px 1fr", gap: 20, marginTop: 24, alignItems: "start" }}>
-        <aside style={{ ...cardStyle, padding: 12, maxHeight: "calc(100vh - 180px)", overflowY: "auto" }}>
+      <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-5" style={{ marginTop: 24, alignItems: "start" }}>
+        <aside className="lg:max-h-[calc(100vh-180px)] overflow-y-auto" style={{ ...cardStyle, padding: 12 }}>
   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "4px 8px 10px" }}>
     <div style={{ fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: 0.6, color: T.textMuted }}>
       Topics
@@ -353,7 +353,7 @@ export default function GrammarContent() {
                 <EmptyState title="No questions yet" description="Add the first question for this topic." />
               )}
               {!loadingQ && questions && questions.length > 0 && (
-                <div style={{ ...cardStyle, padding: 0, overflow: "hidden" }}>
+                <div style={{ ...cardStyle, padding: 0, overflow: "hidden", overflowX: "auto" }}>
                   <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
                     <thead>
                       <tr style={{ background: T.bg }}>
@@ -433,7 +433,7 @@ export function Drawer({ children, onClose, title, subtitle }: { children: React
     <div style={{ position: "fixed", inset: 0, zIndex: 50 }}>
       <div onClick={onClose} style={{ position: "absolute", inset: 0, background: "rgba(15,23,42,0.4)" }} />
       <aside style={{
-        position: "absolute", right: 0, top: 0, bottom: 0, width: 480,
+        position: "absolute", right: 0, top: 0, bottom: 0, width: "min(480px, 100%)",
         background: T.surface, boxShadow: "-2px 0 10px rgba(0,0,0,0.1)",
         display: "flex", flexDirection: "column",
       }}>

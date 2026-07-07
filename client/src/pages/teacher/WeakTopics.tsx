@@ -38,7 +38,7 @@ export default function WeakTopicsPage() {
           {topics.map((t, i) => {
             const color = accuracyColor(t.accuracy_pct);
             return (
-              <div key={`${t.module_slug}-${t.topic}`} style={{ ...cardStyle, padding: 20, display: "grid", gridTemplateColumns: "70px 1fr auto", gap: 16, alignItems: "center" }}>
+              <div key={`${t.module_slug}-${t.topic}`} className="flex flex-col sm:grid sm:items-center gap-4" style={{ ...cardStyle, padding: 20, gridTemplateColumns: "70px 1fr auto" }}>
                 <div style={{ fontSize: 48, fontWeight: 800, color: T.textMuted, lineHeight: 1, textAlign: "center" }}>{i + 1}</div>
                 <div style={{ minWidth: 0 }}>
                   <div style={{ fontSize: 18, fontWeight: 700, color: T.textPrimary }}>{t.topic}</div>

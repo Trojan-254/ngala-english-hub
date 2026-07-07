@@ -59,7 +59,7 @@ export default function VocabularyContent() {
           onSaved={() => { setShowForm(false); load(); }}
         />
       )}
-      <div style={{ display: "grid", gridTemplateColumns: "200px 1fr", gap: 20, marginTop: 22, alignItems: "start" }}>
+      <div className="grid grid-cols-1 lg:grid-cols-[200px_1fr] gap-5" style={{ marginTop: 22, alignItems: "start" }}>
         <aside style={{ ...cardStyle, padding: 16 }}>
           <FilterSection label="Topic">
             <FilterRow active={tagFilter === null} onClick={() => setTagFilter(null)} count={words?.length}>All</FilterRow>
@@ -87,14 +87,14 @@ export default function VocabularyContent() {
         <div>
           {error && <ErrorState message={error} onRetry={load} />}
           {!words && !error && (
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12 }}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {Array.from({ length: 6 }).map((_, i) => <SkeletonBlock key={i} height={150} />)}
             </div>
           )}
           {words && filtered.length === 0 && !error && (
             <EmptyState title="No words found" description="No words found. Add the first word for this category." />
           )}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12 }}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {filtered.map((w) => <WordCard key={w.id} word={w} onEdit={() => openEdit(w)} onDelete={async () => { try { await contentApi.deleteWord(w.id); toast.success("Deleted"); load(); } catch (e) { toast.error((e as Error).message); } }} />)}
           </div>
         </div>
@@ -188,7 +188,7 @@ function WordForm({ initial, onClose, onSaved }: { initial: VocabWord | null; on
   return (
     <div style={{ ...cardStyle, padding: 20, marginTop: 18 }}>
       <h3 style={{ margin: 0, fontWeight: 700, fontSize: 15 }}>{initial ? "Edit Word" : "Add Word"}</h3>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginTop: 14 }}>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3" style={{ marginTop: 14 }}>
         <div>
           <label style={labelStyle}>Word</label>
           <input style={inputStyle} value={word} onChange={(e) => setWord(e.target.value)} required />

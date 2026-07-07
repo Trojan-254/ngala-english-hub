@@ -130,7 +130,7 @@ function NewPaperForm({ onClose, onCreated }: { onClose: () => void; onCreated: 
   }
   return (
     <div style={{ ...cardStyle, padding: 18, marginBottom: 14 }}>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div>
           <label style={labelStyle}>Title</label>
           <input style={inputStyle} value={title} onChange={(e) => setTitle(e.target.value)} />
@@ -207,7 +207,7 @@ function PaperQuestionForm({ paperId, onAdded }: { paperId: number; onAdded: () 
   return (
     <div style={{ padding: 18, background: T.bg, borderTop: `1px solid ${T.border}` }}>
       <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-        <div style={{ display: "grid", gridTemplateColumns: "160px 1fr", gap: 12 }}>
+        <div className="grid grid-cols-1 sm:grid-cols-[160px_1fr] gap-3">
           <div>
             <label style={labelStyle}>Question Number</label>
             <input style={inputStyle} placeholder="e.g. 1(a)" value={qNum} onChange={(e) => setQNum(e.target.value)} />
@@ -222,8 +222,7 @@ function PaperQuestionForm({ paperId, onAdded }: { paperId: number; onAdded: () 
           <QuestionTypeSelector value={qType} onChange={setQType} />
         </div>
         {qType === "mcq" ? <MCQForm value={mcq} onChange={setMcq} /> : <OpenEndedForm value={open} onChange={setOpen} />}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-          <div><label style={labelStyle}>Difficulty</label><DifficultySelector value={difficulty} onChange={setDifficulty} /></div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3"><DifficultySelector value={difficulty} onChange={setDifficulty} /></div>
           <div><label style={labelStyle}>Curriculum</label><CurriculumSelector value={curriculum} onChange={setCurriculum} /></div>
         </div>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingTop: 6 }}>

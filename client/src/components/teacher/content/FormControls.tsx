@@ -63,7 +63,7 @@ export function QuestionTypeSelector({ value, onChange }: { value: QuestionType;
     { v: "essay", label: "Essay / Long Answer", desc: "Paragraph response. Teacher marks.", Icon: FileText },
   ];
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10 }}>
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
       {types.map(({ v, label, desc, Icon }) => {
         const active = value === v;
         return (

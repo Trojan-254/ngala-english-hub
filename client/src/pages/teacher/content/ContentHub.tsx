@@ -48,7 +48,7 @@ export default function ContentHub() {
       <p style={{ color: T.textSecondary, marginTop: 6, fontSize: 14 }}>
         Add and manage all learning content for your students.
       </p>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginTop: 24 }}>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5" style={{ marginTop: 24 }}>
         <ModuleCard
           strip={T.primary}
           Icon={BookOpen}

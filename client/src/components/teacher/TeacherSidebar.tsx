@@ -1,7 +1,9 @@
 import { NavLink, useNavigate } from "react-router-dom";
-import { LayoutDashboard, Users, TrendingDown, Key, Trophy, LogOut, BookOpen } from "lucide-react";
+import { LayoutDashboard, Users, TrendingDown, Key, Trophy, LogOut, BookOpen, Menu, X } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { T, initialsOf } from "./tokens";
+import { useState, useEffect } from "react";
+
 const nav = [
   { to: "/teacher", icon: LayoutDashboard, label: "Overview", end: true },
   { to: "/teacher/students", icon: Users, label: "Students" },
@@ -10,36 +12,46 @@ const nav = [
   { to: "/teacher/codes", icon: Key, label: "Class Codes" },
   { to: "/teacher/leaderboard", icon: Trophy, label: "Leaderboard" },
 ];
+
 export default function TeacherSidebar() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const [open, setOpen] = useState(false);
+
   const handleLogout = () => {
     logout();
     navigate("/");
   };
   const currentYear = new Date().getFullYear();
 
-  return (
-    <aside
-      style={{
-        position: "fixed",
-        top: 0,
-        left: 0,
-        width: 220,
-        height: "100vh",
-        background: T.primary,
-        color: "#fff",
-        display: "flex",
-        flexDirection: "column",
-        fontFamily: "Inter, sans-serif",
-        zIndex: 30,
-      }}
-    >
-      <div style={{ padding: "24px 20px 16px" }}>
-        <div style={{ fontWeight: 800, fontSize: 20, color: "#fff", letterSpacing: -0.3 }}>Ngala</div>
-        <div style={{ color: T.gold, fontSize: 11, fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", marginTop: 2 }}>
-          Teacher Portal
+  useEffect(() => {
+    const onResize = () => { if (window.innerWidth >= 1024) setOpen(false); };
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+
+  useEffect(() => {
+    document.body.style.overflow = open ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
+  }, [open]);
+
+  const sidebarContent = (
+    <>
+      <div style={{ padding: "24px 20px 16px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <div>
+          <div style={{ fontWeight: 800, fontSize: 20, color: "#fff", letterSpacing: -0.3 }}>Ngala</div>
+          <div style={{ color: T.gold, fontSize: 11, fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", marginTop: 2 }}>
+            Teacher Portal
+          </div>
         </div>
+        <button
+          onClick={() => setOpen(false)}
+          className="lg:hidden"
+          style={{ background: "transparent", border: "none", color: "rgba(255,255,255,0.7)", cursor: "pointer", padding: 4, borderRadius: 6 }}
+          aria-label="Close menu"
+        >
+          <X size={20} />
+        </button>
       </div>
       {user && (
         <div style={{ padding: "0 20px 20px", borderBottom: "1px solid rgba(255,255,255,0.08)", marginBottom: 12 }}>
@@ -70,6 +82,7 @@ export default function TeacherSidebar() {
             key={to}
             to={to}
             end={end}
+            onClick={() => setOpen(false)}
             style={({ isActive }) => ({
               display: "flex", alignItems: "center", gap: 12,
               padding: "10px 12px",
@@ -101,10 +114,48 @@ export default function TeacherSidebar() {
         <LogOut size={16} />
         Logout
       </button>
-
       <div className="px-6 py-5 text-[11px] text-white/40">
         Powered by Katana Ngala Senior School @{currentYear}
       </div>
-    </aside>
+    </>
+  );
+
+  return (
+    <>
+      {/* Mobile hamburger trigger */}
+      <button
+        onClick={() => setOpen(true)}
+        className="lg:hidden fixed top-4 left-4 z-40 p-2.5 rounded-xl shadow-lg"
+        style={{ background: T.primary, border: "none", color: "#fff", cursor: "pointer" }}
+        aria-label="Open menu"
+      >
+        <Menu size={20} />
+      </button>
+
+      {/* Backdrop */}
+      {open && (
+        <div
+          onClick={() => setOpen(false)}
+          className="lg:hidden fixed inset-0 z-40"
+          style={{ background: "rgba(0,0,0,0.5)" }}
+        />
+      )}
+
+      {/* Desktop sidebar */}
+      <aside
+        className="hidden lg:flex flex-col"
+        style={{ position: "fixed", top: 0, left: 0, width: 220, height: "100vh", background: T.primary, color: "#fff", fontFamily: "Inter, sans-serif", zIndex: 30 }}
+      >
+        {sidebarContent}
+      </aside>
+
+      {/* Mobile drawer */}
+      <aside
+        className={`lg:hidden fixed top-0 left-0 h-screen flex flex-col z-50 transition-transform duration-300 ${open ? "translate-x-0" : "-translate-x-full"}`}
+        style={{ width: 260, background: T.primary, color: "#fff", fontFamily: "Inter, sans-serif" }}
+      >
+        {sidebarContent}
+      </aside>
+    </>
   );
 }

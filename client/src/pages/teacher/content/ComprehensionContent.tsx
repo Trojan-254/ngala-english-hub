@@ -114,7 +114,7 @@ function PassageForm({ topics, onClose, onCreated }: { topics: Topic[]; onClose:
   return (
     <div style={{ ...cardStyle, padding: 20, marginTop: 18 }}>
       <h3 style={{ margin: 0, fontWeight: 700, fontSize: 15 }}>New Passage</h3>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginTop: 14 }}>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4" style={{ marginTop: 14 }}>
         <div>
           <label style={labelStyle}>Title</label>
           <input style={inputStyle} value={title} onChange={(e) => setTitle(e.target.value)} required />

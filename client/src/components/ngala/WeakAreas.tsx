@@ -39,7 +39,7 @@ export const WeakAreas = ({ topics, loading }: Props) => {
         {topics.map((t) => (
           <li
             key={t.topic}
-            className="flex items-center justify-between bg-card rounded-xl px-4 py-3 border border-border/60"
+            className="flex flex-wrap items-center justify-between gap-2 bg-card rounded-xl px-4 py-3 border border-border/60"
           >
             <div className="flex items-center gap-3">
               <span className="text-sm font-semibold text-foreground">{t.topic}</span>

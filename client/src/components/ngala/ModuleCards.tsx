@@ -64,13 +64,13 @@ export const ModuleCards = ({ dashboard }: Props) => {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {modules.map((m) => {
           const pct = m.total > 0 ? Math.min(Math.round((m.done / m.total) * 100), 100) : 0;
           return (
             <article
               key={m.title}
-              className={`lift-card relative rounded-2xl shadow-card overflow-hidden bg-gradient-to-br ${m.gradient} text-white p-6 min-h-[230px] flex flex-col`}
+              className={`lift-card relative rounded-2xl shadow-card overflow-hidden bg-gradient-to-br ${m.gradient} text-white p-4 lg:p-6 min-h-[200px] lg:min-h-[230px] flex flex-col`}
             >
               <div className="absolute -right-10 -top-10 w-48 h-48 rounded-full bg-white/10 select-none" />
               <div className="absolute -right-20 top-16 w-40 h-40 rounded-full bg-white/5 select-none" />

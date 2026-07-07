@@ -71,7 +71,7 @@ export default function CodesPage() {
           marginBottom: showForm ? 20 : 0,
         }}
       >
-        <form onSubmit={submit} style={{ ...cardStyle, padding: 20, display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr auto", gap: 12, alignItems: "end" }}>
+        <form onSubmit={submit} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[1fr_1fr_1fr_1fr_auto] gap-3 items-end" style={{ ...cardStyle, padding: 20 }}>
           <Field label="Code"><input required value={code} onChange={(e) => setCode(e.target.value.toUpperCase().slice(0, 10))} placeholder="e.g. F3L-2026" style={inputStyle} /></Field>
           <Field label="Class Group"><input required value={classGroup} onChange={(e) => setClassGroup(e.target.value)} placeholder="e.g. Form 3L" style={inputStyle} /></Field>
           <Field label="Curriculum">
@@ -104,7 +104,7 @@ export default function CodesPage() {
             const daysLeft = Math.ceil((expiresAt.getTime() - Date.now()) / 86400000);
             const expiringSoon = daysLeft <= 7 && daysLeft >= 0;
             return (
-              <div key={c.id} style={{ ...cardStyle, padding: 20, display: "grid", gridTemplateColumns: "auto 1fr auto auto", gap: 20, alignItems: "center" }}>
+              <div key={c.id} className="grid grid-cols-1 sm:grid-cols-[auto_1fr_auto_auto] items-center gap-4" style={{ ...cardStyle, padding: 20 }}>
                 <div>
                   <div style={{ fontSize: 24, fontWeight: 800, color: T.primary, fontFamily: "ui-monospace, Menlo, monospace", letterSpacing: 1 }}>{c.code}</div>
                   <div style={{ fontSize: 12, color: T.textMuted, marginTop: 4 }}>{c.class_group} · {c.curriculum}</div>

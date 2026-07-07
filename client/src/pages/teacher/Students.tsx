@@ -68,12 +68,12 @@ export default function StudentsPage() {
     <TeacherShell>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20, gap: 16, flexWrap: "wrap" }}>
         <h1 style={{ fontSize: 24, fontWeight: 800, color: T.textPrimary, margin: 0 }}>Students</h1>
-        <div style={{ display: "flex", gap: 12 }}>
+        <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search students..."
-            style={{ padding: "8px 12px", border: `1px solid ${T.border}`, borderRadius: 8, fontSize: 13, width: 240, fontFamily: "inherit", outline: "none" }}
+            style={{ padding: "8px 12px", border: `1px solid ${T.border}`, borderRadius: 8, fontSize: 13, width: "min(240px, 100%)", fontFamily: "inherit", outline: "none" }}
           />
           <select value={classFilter} onChange={(e) => setClassFilter(e.target.value)} style={{ padding: "8px 12px", border: `1px solid ${T.border}`, borderRadius: 8, fontSize: 13, fontFamily: "inherit", background: "#fff" }}>
             <option value="">All Classes</option>
@@ -91,7 +91,7 @@ export default function StudentsPage() {
           />
         ) : (
           <>
-            <div style={{ ...cardStyle, overflow: "hidden" }}>
+            <div style={{ ...cardStyle, overflow: "hidden", overflowX: "auto" }}>
               <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
                 <thead>
                   <tr style={{ background: T.bg, color: T.textSecondary, fontSize: 11, textTransform: "uppercase", letterSpacing: 0.5 }}>
