@@ -222,7 +222,8 @@ function PaperQuestionForm({ paperId, onAdded }: { paperId: number; onAdded: () 
           <QuestionTypeSelector value={qType} onChange={setQType} />
         </div>
         {qType === "mcq" ? <MCQForm value={mcq} onChange={setMcq} /> : <OpenEndedForm value={open} onChange={setOpen} />}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3"><DifficultySelector value={difficulty} onChange={setDifficulty} /></div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div><label style={labelStyle}>Difficulty</label><DifficultySelector value={difficulty} onChange={setDifficulty} /></div>
           <div><label style={labelStyle}>Curriculum</label><CurriculumSelector value={curriculum} onChange={setCurriculum} /></div>
         </div>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingTop: 6 }}>
