@@ -30,7 +30,7 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!sessionId || !user) return;
 
-    const socketUrl = BASE_URL.replace('/api', '');
+    const socketUrl = BASE_URL.replace(/\/api$/, '') || '/';
 
     const socket = io(socketUrl, {
       transports: ['websocket', 'polling'],
