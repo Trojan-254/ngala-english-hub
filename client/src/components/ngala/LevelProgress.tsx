@@ -23,9 +23,9 @@ export const LevelProgress = () => {
   const { current, next, pct } = getLevelInfo(xp);
 
   return (
-    <div className="bg-card rounded-2xl shadow-card p-7">
-      <div className="grid grid-cols-12 gap-8 items-center">
-        <div className="col-span-5">
+    <div className="bg-card rounded-2xl shadow-card p-4 lg:p-7">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center">
+        <div className="lg:col-span-5">
           <div className="flex items-baseline gap-3">
             <div className="stat-num text-5xl text-primary">Level {current.n}</div>
             <div className="text-secondary font-bold text-lg">{current.name}</div>
@@ -45,20 +45,20 @@ export const LevelProgress = () => {
           </div>
         </div>
 
-        <div className="col-span-7">
-          <div className="relative flex items-center justify-between">
+        <div className="lg:col-span-7">
+          <div className="relative flex items-center justify-between overflow-x-auto pb-1">
             <div className="absolute left-6 right-6 top-1/2 -translate-y-1/2 h-0.5 bg-border" />
             {LEVELS.map((l) => {
               const state = l.n < current.n ? 'done'
                 : l.n === current.n ? 'current'
                 : 'locked';
-              const base = "relative z-10 w-14 h-14 rounded-full flex items-center justify-center text-2xl ring-4 transition-all";
+              const base = "relative z-10 w-10 h-10 lg:w-14 lg:h-14 rounded-full flex items-center justify-center text-lg lg:text-2xl ring-4 transition-all";
               const styles =
                 state === "current" ? "bg-secondary text-primary ring-secondary/30 pulse-glow"
                 : state === "done"  ? "bg-primary text-primary-foreground ring-primary/15"
                 : "bg-muted text-muted-foreground/60 ring-border";
               return (
-                <div key={l.n} className="flex flex-col items-center gap-2 w-16">
+                <div key={l.n} className="flex flex-col items-center gap-1 lg:gap-2 w-12 lg:w-16">
                   <div className={`${base} ${styles}`}>{l.icon}</div>
                   <div className="text-[11px] font-semibold text-foreground text-center leading-tight">
                     {l.name}

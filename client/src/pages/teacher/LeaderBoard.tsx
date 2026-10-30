@@ -32,9 +32,9 @@ export default function LeaderboardPage() {
   };
   return (
     <TeacherShell>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20, flexWrap: "wrap", gap: 12 }}>
         <h1 style={{ fontSize: 24, fontWeight: 800, margin: 0, color: T.textPrimary }}>Class Leaderboard</h1>
-        <div style={{ display: "flex", gap: 12 }}>
+        <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
           <div style={{ display: "flex", background: "#fff", border: `1px solid ${T.border}`, borderRadius: 8, padding: 3 }}>
             {(["all", "week"] as Mode[]).map((m) => (
               <button key={m} onClick={() => setMode(m)} style={{ padding: "6px 14px", background: mode === m ? T.primary : "transparent", color: mode === m ? "#fff" : T.textSecondary, border: "none", borderRadius: 6, fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}>
@@ -51,7 +51,7 @@ export default function LeaderboardPage() {
       {error ? <ErrorState message={error} onRetry={() => load(classFilter || undefined)} /> :
        loading ? <SkeletonBlock height={400} /> :
        sorted.length === 0 ? <EmptyState title="No leaderboard data yet" description="Students will appear here once they start earning XP." /> : (
-        <div style={{ ...cardStyle, overflow: "hidden" }}>
+        <div style={{ ...cardStyle, overflow: "hidden", overflowX: "auto" }}>
           <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
             <thead>
               <tr style={{ background: T.bg, color: T.textSecondary, fontSize: 11, textTransform: "uppercase", letterSpacing: 0.5 }}>

@@ -52,7 +52,7 @@ export default function TeacherOverview() {
       </div>
       {error && <ErrorState message={error} onRetry={load} />}
       {!error && (
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 320px", gap: 24, alignItems: "start" }}>
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6 items-start">
           <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
             <StatsRow loading={loading} overview={overview} />
             <ModulePerformance loading={loading} modules={modules} />
@@ -73,7 +73,7 @@ function StatsRow({ loading, overview }: { loading: boolean; overview: Overview 
     { color: T.red, label: "Weekly Accuracy", value: overview?.weekly_accuracy ?? 0, suffix: "%" },
   ];
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16 }}>
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
       {cards.map((c) => (
         <div key={c.label} style={{ ...cardStyle, padding: 0, overflow: "hidden" }}>
           <div style={{ height: 4, background: c.color }} />
@@ -111,17 +111,17 @@ function ModulePerformance({ loading, modules }: { loading: boolean; modules: Mo
             const pct = m?.accuracy_pct ?? 0;
             const color = m ? accuracyColor(pct) : T.border;
             return (
-              <div key={slug} style={{ display: "grid", gridTemplateColumns: "180px 1fr 70px", gap: 16, alignItems: "center" }}>
-                <div style={{ fontSize: 13, fontWeight: 600, color: T.textPrimary }}>{moduleLabel(slug)}</div>
-                <div>
-                  <div style={{ height: 8, background: T.bg, borderRadius: 999, overflow: "hidden" }}>
-                    <div style={{ height: "100%", width: `${pct}%`, background: color, borderRadius: 999, transition: "width 600ms ease" }} />
-                  </div>
-                  <div style={{ fontSize: 11, color: T.textMuted, marginTop: 4 }}>
-                    {m ? `${m.total_attempts} attempts · ${m.unique_students} students` : "No attempts yet"}
-                  </div>
+              <div key={slug} style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: T.textPrimary }}>{moduleLabel(slug)}</div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: T.textPrimary }}>{m ? `${pct}%` : "—"}</div>
                 </div>
-                <div style={{ fontSize: 13, fontWeight: 700, color: T.textPrimary, textAlign: "right" }}>{m ? `${pct}%` : "—"}</div>
+                <div style={{ height: 8, background: T.bg, borderRadius: 999, overflow: "hidden" }}>
+                  <div style={{ height: "100%", width: `${pct}%`, background: color, borderRadius: 999, transition: "width 600ms ease" }} />
+                </div>
+                <div style={{ fontSize: 11, color: T.textMuted }}>
+                  {m ? `${m.total_attempts} attempts · ${m.unique_students} students` : "No attempts yet"}
+                </div>
               </div>
             );
           })}
