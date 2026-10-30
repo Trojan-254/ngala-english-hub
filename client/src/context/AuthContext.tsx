@@ -5,13 +5,14 @@ interface AuthContextType {
   user: User | null;
   sessionId: string | null;
   loading: boolean;
-  login: (username: string, password: string) => Promise<void>;
+  login: (username: string, password: string) => Promise<User>;
   logout: () => Promise<void>;
   register: (payload: {
     username: string;
     display_name: string;
     password: string;
-    class_code: string;
+    class_code?: string;
+    curriculum?: string;
   }) => Promise<void>;
 }
 
@@ -51,7 +52,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     username: string;
     display_name: string;
     password: string;
-    class_code: string;
+    class_code?: string;
+    curriculum?: string;
   }) => {
     const { sessionId, user } = await api.auth.register(payload);
     localStorage.setItem('sessionId', sessionId);

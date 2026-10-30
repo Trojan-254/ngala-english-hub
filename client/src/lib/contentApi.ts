@@ -1,3 +1,4 @@
+import { BASE_URL, readJson } from "./api-config";
 export type QuestionType = "mcq" | "short_answer" | "essay";
 export type Difficulty = 1 | 2 | 3;
 export type Curriculum = "both" | "844" | "CBE";
@@ -96,21 +97,21 @@ function authHeaders(): HeadersInit {
   return { "x-session-id": sid, "Content-Type": "application/json" };
 }
 async function request<T>(path: string, method: string = "GET", body?: unknown): Promise<T> {
-  const res = await fetch(`/api/content${path}`, {
+  const res = await fetch(`${BASE_URL}/content${path}`, {
     method,
     headers: authHeaders(),
     body: body !== undefined ? JSON.stringify(body) : undefined,
   });
-  if (!res.ok) {
-    const txt = await res.text().catch(() => "");
-    throw new Error(txt || `Request failed: ${res.status}`);
-  }
-  return (await res.json()) as T;
+  const data = await readJson<T & { error?: string }>(res);
+  if (!res.ok) throw new Error(data.error || `Request failed: ${res.status}`);
+  return data;
 }
+// path is relative to the API root, e.g. "/grammar/topics"
 async function rawRequest<T>(path: string): Promise<T> {
-  const res = await fetch(path, { headers: authHeaders() });
-  if (!res.ok) throw new Error(`Request failed: ${res.status}`);
-  return (await res.json()) as T;
+  const res = await fetch(`${BASE_URL}${path}`, { headers: authHeaders() });
+  const data = await readJson<T & { error?: string }>(res);
+  if (!res.ok) throw new Error(data.error || `Request failed: ${res.status}`);
+  return data;
 }
 function qs(params: Record<string, string | undefined>): string {
   const entries = Object.entries(params).filter(([, v]) => v !== undefined && v !== "");
@@ -119,8 +120,8 @@ function qs(params: Record<string, string | undefined>): string {
 }
 export const contentApi = {
   // Topics (student-facing endpoints, accessible with session header)
-  getGrammarTopics: () => rawRequest<{ topics: Topic[] }>("/api/grammar/topics"),
-  getComprehensionTopics: () => rawRequest<{ topics: Topic[] }>("/api/comprehension/topics"),
+  getGrammarTopics: () => rawRequest<{ topics: Topic[] }>("/grammar/topics"),
+  getComprehensionTopics: () => rawRequest<{ topics: Topic[] }>("/comprehension/topics"),
   // Grammar / Questions
   getQuestions: (topic_id?: number, module_slug?: string) =>
     request<{ questions: Question[] }>(`/questions${qs({ topic_id: topic_id?.toString(), module_slug })}`),

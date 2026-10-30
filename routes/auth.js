@@ -7,6 +7,8 @@ const { requireAuth } = require('../middleware/auth');
 
 const SALT_ROUNDS = 10;
 const SESSION_DURATION_DAYS = 7;
+const MIN_PASSWORD_LENGTH = 6;
+const { INDEPENDENT_GROUP } = require('../services/groups');
 
 function generateSessionId() {
   return randomBytes(32).toString('hex');
@@ -21,44 +23,49 @@ function getExpiryDate() {
 // ===== registration ===========
 router.post('/register', (req, res) => {
   const db = getDb();
-  const { username, display_name, password, role, class_code } = req.body;
+  const { username, display_name, password, class_code } = req.body;
+  // Teacher accounts are created by an admin (scripts/create-admin.js), never self-registered.
+  const role = 'student';
 
   if (!username || !display_name || !password) {
     return res.status(400).json({ error: 'Username, display name and password are required' });
   }
-  if (password.length < 4) {
-    return res.status(400).json({ error: 'Password must be at least 4 characters' });
+  if (password.length < MIN_PASSWORD_LENGTH) {
+    return res.status(400).json({ error: `Password must be at least ${MIN_PASSWORD_LENGTH} characters` });
   }
-  if (username.length < 3) {
-    return res.status(400).json({ error: 'Username must be at least 3 characters' });
+  if (username.length < 3 || !/^[a-z0-9_]+$/i.test(username)) {
+    return res.status(400).json({ error: 'Username must be at least 3 characters: letters, numbers and underscores only' });
   }
 
-  // Students must provide a class code
+  // Open enrolment: any student can join.
+  // With a valid class code they join that teacher's class; without one they
+  // join the 'Independent' group, which teacher dashboards do not list.
   let class_group = null;
   let curriculum = null;
 
   if (role !== 'teacher') {
-    if (!class_code) {
-      return res.status(400).json({ error: 'A class code is required to register as a student' });
+    if (class_code && class_code.trim()) {
+      const code = db.prepare(`
+        SELECT * FROM class_codes
+        WHERE code = ?
+          AND is_active = 1
+          AND expires_at > datetime('now')
+      `).get(class_code.toUpperCase().trim());
+
+      if (!code) {
+        return res.status(400).json({ error: 'That class code is invalid or has expired. Check it with your teacher, or leave it blank to join on your own.' });
+      }
+
+      class_group = code.class_group;
+      curriculum = code.curriculum;
+    } else {
+      class_group = INDEPENDENT_GROUP;
+      curriculum = 'CBE'; // Ngala follows the CBC only
     }
-
-    const code = db.prepare(`
-      SELECT * FROM class_codes
-      WHERE code = ?
-        AND is_active = 1
-        AND expires_at > datetime('now')
-    `).get(class_code.toUpperCase().trim());
-
-    if (!code) {
-      return res.status(400).json({ error: 'Invalid or expired class code. Ask your teacher for a valid code.' });
-    }
-
-    class_group = code.class_group;
-    curriculum = code.curriculum;
   }
 
   // Check username taken
-  const existing = db.prepare('SELECT id FROM users WHERE username = ?').get(username);
+  const existing = db.prepare('SELECT id FROM users WHERE username = ?').get(username.toLowerCase().trim());
   if (existing) {
     return res.status(409).json({ error: 'Username already taken' });
   }

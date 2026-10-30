@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { BookOpen } from 'lucide-react';
+import { NgalaLogo } from '@/components/brand/Logo';
 import { useAuth } from '@/context/AuthContext';
 
 const Login = () => {
@@ -31,23 +31,18 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-6">
+    <div className="min-h-screen bg-sand flex items-center justify-center p-6">
       <div className="w-full max-w-[420px]">
 
-        {/* Logo */}
-        <div className="flex items-center justify-center gap-3 mb-8">
-          
-          <div>
-            <div className="text-2xl font-extrabold text-primary tracking-tight">Ngala</div>
-            <div className="text-[11px] font-bold text-secondary uppercase tracking-widest">English Hub</div>
-          </div>
-        </div>
+        <Link to="/" className="flex justify-center mb-8" aria-label="Ngala home">
+          <NgalaLogo animated />
+        </Link>
 
         {/* Card */}
         <div className="bg-card rounded-2xl border border-border p-8"
           style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.08)' }}>
-          <h1 className="text-xl font-extrabold text-foreground">Welcome back</h1>
-          <p className="text-sm text-muted-foreground mt-1">Sign in to continue....</p>
+          <h1 className="font-display text-2xl font-extrabold text-ink tracking-tight">Welcome back</h1>
+          <p className="text-sm text-muted-foreground mt-1">Sign in to keep your streak going.</p>
 
           {error && (
             <div className="mt-4 px-4 py-3 rounded-lg bg-destructive/10 border border-destructive/20 text-sm text-destructive font-medium">

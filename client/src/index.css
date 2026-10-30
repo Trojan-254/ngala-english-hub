@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Fraunces:ital,opsz,wght@0,9..144,500;1,9..144,500&family=Inter:wght@400;500;600;700;800;900&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -47,6 +47,19 @@
     --radius: 0.875rem;
 
     --amber-soft: 48 100% 95%;            /* #FFF9E6 */
+
+    /* Brand v2: coastal palette */
+    --ink: 194 57% 13%;                   /* #0E2A33 Usiku, headlines */
+    --sand: 40 65% 96%;                   /* #FBF6EC Mchanga, warm canvas */
+    --skill-listen: 200 64% 46%;          /* #2A8FC4 Lagoon */
+    --skill-speak: 37 90% 58%;            /* #F4A932 Jua */
+    --skill-read: 148 58% 43%;            /* #2EAD6B Mikoko */
+    --skill-write: 8 77% 60%;             /* #E8604C Matumbawe */
+    --skill-lit: 282 36% 36%;             /* #6C3483 Zambarau */
+    --skill-listen-ink: 201 69% 35%;    /* #1B6A96 text on light, and fill under white text */
+    --skill-speak-ink: 37 100% 27%;     /* #8A5600 text on light, and fill under white text */
+    --skill-read-ink: 147 65% 27%;      /* #18703F text on light, and fill under white text */
+    --skill-write-ink: 10 70% 41%;     /* #B0381F text on light, and fill under white text */
 
     --shadow-card: 0 1px 2px hsl(240 23% 14% / 0.04), 0 4px 16px hsl(195 81% 23% / 0.06);
     --shadow-lift: 0 10px 30px -10px hsl(195 81% 23% / 0.25);
@@ -108,4 +121,42 @@
   .badge-card:hover { transform: scale(1.06); }
 
   .locked { filter: grayscale(1) opacity(.7); }
+
+  /* ===== Landing page motion ===== */
+  .font-display { font-family: 'Bricolage Grotesque', 'Inter', system-ui, sans-serif; font-optical-sizing: auto; }
+  .font-literary { font-family: 'Fraunces', Georgia, serif; }
+
+  @keyframes floatY { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+  .float-slow { animation: floatY 6s ease-in-out infinite; }
+  .float-slower { animation: floatY 8s ease-in-out infinite; }
+
+  @keyframes riseIn { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: translateY(0); } }
+  .rise-in { animation: riseIn .8s cubic-bezier(.2,.8,.2,1) both; }
+
+  @keyframes popIn { 0% { opacity: 0; transform: scale(.6); } 70% { transform: scale(1.08); } 100% { opacity: 1; transform: scale(1); } }
+  .pop-in { animation: popIn .45s cubic-bezier(.2,.8,.2,1) both; }
+
+  @keyframes shake { 0%,100% { transform: translateX(0); } 20%,60% { transform: translateX(-6px); } 40%,80% { transform: translateX(6px); } }
+  .shake { animation: shake .4s ease-in-out; }
+
+  @keyframes xpFloat { 0% { opacity: 0; transform: translateY(6px) scale(.9); } 20% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-34px) scale(1.05); } }
+  .xp-float { animation: xpFloat 1.4s ease-out forwards; }
+
+  @keyframes sparkTwinkle { 0%,100% { transform: scale(1) rotate(0deg); opacity: 1; } 50% { transform: scale(.82) rotate(12deg); opacity: .8; } }
+  .spark-twinkle { animation: sparkTwinkle 3.2s ease-in-out infinite; transform-origin: center; }
+
+  @keyframes wave { 0%,100% { transform: scaleY(.45); } 50% { transform: scaleY(1); } }
+  .wave-bar { animation: wave 1s ease-in-out infinite; transform-origin: bottom; }
+
+  @keyframes dash { to { stroke-dashoffset: 0; } }
+  .draw-path { stroke-dasharray: 600; stroke-dashoffset: 600; animation: dash 2.2s ease-out forwards; }
+
+  .reveal { opacity: 0; transform: translateY(26px); transition: opacity .8s cubic-bezier(.2,.8,.2,1), transform .8s cubic-bezier(.2,.8,.2,1); }
+  .reveal.is-visible { opacity: 1; transform: none; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .float-slow, .float-slower, .spark-twinkle, .wave-bar, .rise-in, .pop-in, .xp-float, .draw-path { animation: none !important; }
+    .draw-path { stroke-dashoffset: 0; }
+    .reveal { opacity: 1; transform: none; transition: none; }
+  }
 }

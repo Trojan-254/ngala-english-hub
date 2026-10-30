@@ -1,3 +1,4 @@
+import { BASE_URL, readJson } from "./api-config";
 export interface Overview {
   total_students: number;
   class_groups: number;
@@ -67,15 +68,13 @@ function authHeaders(): HeadersInit {
   return { "x-session-id": sid, "Content-Type": "application/json" };
 }
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(`/api${path}`, {
+  const res = await fetch(`${BASE_URL}${path}`, {
     ...init,
     headers: { ...authHeaders(), ...(init?.headers ?? {}) },
   });
-  if (!res.ok) {
-    const txt = await res.text().catch(() => "");
-    throw new Error(txt || `Request failed: ${res.status}`);
-  }
-  return (await res.json()) as T;
+  const data = await readJson<T & { error?: string }>(res);
+  if (!res.ok) throw new Error(data.error || `Request failed: ${res.status}`);
+  return data;
 }
 function qs(params: Record<string, string | undefined>): string {
   const entries = Object.entries(params).filter(([, v]) => v !== undefined && v !== "");

@@ -138,7 +138,7 @@ export const RightSidebar = () => {
     : restLeaderboard;
 
   return (
-    <aside className="w-[300px] shrink-0 space-y-5">
+    <aside className="hidden lg:block w-[300px] shrink-0 space-y-5">
 
       {/* Streak calendar */}
       <div className="bg-card rounded-2xl shadow-card p-5">

@@ -1,4 +1,4 @@
-import { BASE_URL } from './api-config';
+import { BASE_URL, readJson } from './api-config';
 
 function getSessionId(): string | null {
   return localStorage.getItem('sessionId');
@@ -20,16 +20,21 @@ async function request<T>(
        headers['x-session-id'] = sessionId;
     }
 
-    const response = await fetch(`${baseUrl}${path}`, {
-      method,
-      headers,
-      body: body ? JSON.stringify(body) : undefined,
-    });
+    let response: Response;
+    try {
+      response = await fetch(`${baseUrl}${path}`, {
+        method,
+        headers,
+        body: body ? JSON.stringify(body) : undefined,
+      });
+    } catch {
+      throw new Error("Can't reach the Ngala server. Check your connection and try again.");
+    }
 
-    const data = await response.json();
+    const data = await readJson<T & { error?: string }>(response);
 
     if (!response.ok) {
-       throw new Error(data.error || 'Request failed');
+       throw new Error(data.error || `Request failed (${response.status})`);
     }
 
     return data;
@@ -42,7 +47,8 @@ export const api = {
       username: string;
       display_name: string;
       password: string;
-      class_code: string;
+      class_code?: string;
+      curriculum?: string;
     }) => request<{ sessionId: string; user: User }>('POST', '/auth/register', payload),
 
     login: (username: string, password: string) =>

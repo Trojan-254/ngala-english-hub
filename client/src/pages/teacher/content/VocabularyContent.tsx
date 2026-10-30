@@ -59,7 +59,7 @@ export default function VocabularyContent() {
           onSaved={() => { setShowForm(false); load(); }}
         />
       )}
-      <div style={{ display: "grid", gridTemplateColumns: "200px 1fr", gap: 20, marginTop: 22, alignItems: "start" }}>
+      <div className="grid grid-cols-1 lg:grid-cols-[200px_1fr] gap-5" style={{ marginTop: 22, alignItems: "start" }}>
         <aside style={{ ...cardStyle, padding: 16 }}>
           <FilterSection label="Topic">
             <FilterRow active={tagFilter === null} onClick={() => setTagFilter(null)} count={words?.length}>All</FilterRow>
@@ -79,22 +79,21 @@ export default function VocabularyContent() {
           </FilterSection>
           <FilterSection label="Curriculum">
             <FilterRow active={currFilter === null} onClick={() => setCurrFilter(null)}>All</FilterRow>
-            <FilterRow active={currFilter === "both"} onClick={() => setCurrFilter("both")}>Both</FilterRow>
-            <FilterRow active={currFilter === "844"} onClick={() => setCurrFilter("844")}>8-4-4</FilterRow>
             <FilterRow active={currFilter === "CBE"} onClick={() => setCurrFilter("CBE")}>CBE</FilterRow>
+            <FilterRow active={currFilter === "both"} onClick={() => setCurrFilter("both")}>General</FilterRow>
           </FilterSection>
         </aside>
         <div>
           {error && <ErrorState message={error} onRetry={load} />}
           {!words && !error && (
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12 }}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {Array.from({ length: 6 }).map((_, i) => <SkeletonBlock key={i} height={150} />)}
             </div>
           )}
           {words && filtered.length === 0 && !error && (
             <EmptyState title="No words found" description="No words found. Add the first word for this category." />
           )}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12 }}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {filtered.map((w) => <WordCard key={w.id} word={w} onEdit={() => openEdit(w)} onDelete={async () => { try { await contentApi.deleteWord(w.id); toast.success("Deleted"); load(); } catch (e) { toast.error((e as Error).message); } }} />)}
           </div>
         </div>
@@ -188,7 +187,7 @@ function WordForm({ initial, onClose, onSaved }: { initial: VocabWord | null; on
   return (
     <div style={{ ...cardStyle, padding: 20, marginTop: 18 }}>
       <h3 style={{ margin: 0, fontWeight: 700, fontSize: 15 }}>{initial ? "Edit Word" : "Add Word"}</h3>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginTop: 14 }}>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3" style={{ marginTop: 14 }}>
         <div>
           <label style={labelStyle}>Word</label>
           <input style={inputStyle} value={word} onChange={(e) => setWord(e.target.value)} required />
@@ -205,7 +204,7 @@ function WordForm({ initial, onClose, onSaved }: { initial: VocabWord | null; on
         </div>
         <div style={{ gridColumn: "1 / -1" }}>
           <label style={labelStyle}>Example Sentence</label>
-          <textarea rows={2} style={{ ...inputStyle, resize: "vertical" }} value={example} onChange={(e) => setExample(e.target.value)} placeholder="Use the word in a sentence a Form 3 student would understand" required />
+          <textarea rows={2} style={{ ...inputStyle, resize: "vertical" }} value={example} onChange={(e) => setExample(e.target.value)} placeholder="Use the word in a sentence a Grade 10 student would understand" required />
         </div>
         <div>
           <label style={labelStyle}>Synonym (optional, comma-separated)</label>

@@ -7,7 +7,11 @@ export default {
   theme: {
     container: { center: true, padding: "2rem", screens: { "2xl": "1400px" } },
     extend: {
-      fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+      fontFamily: {
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+        display: ['"Bricolage Grotesque"', 'Inter', 'system-ui', 'sans-serif'],
+        literary: ['Fraunces', 'Georgia', 'serif'],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -54,6 +58,19 @@ export default {
           foreground: "hsl(var(--card-foreground))",
         },
         amber: { soft: "hsl(var(--amber-soft))" },
+        ink: "hsl(var(--ink))",
+        sand: "hsl(var(--sand))",
+        skill: {
+          listen: "hsl(var(--skill-listen))",
+          speak: "hsl(var(--skill-speak))",
+          read: "hsl(var(--skill-read))",
+          write: "hsl(var(--skill-write))",
+          lit: "hsl(var(--skill-lit))",
+          "listen-ink": "hsl(var(--skill-listen-ink))",
+          "speak-ink": "hsl(var(--skill-speak-ink))",
+          "read-ink": "hsl(var(--skill-read-ink))",
+          "write-ink": "hsl(var(--skill-write-ink))",
+        },
       },
       boxShadow: {
         card: "var(--shadow-card)",
