@@ -12,9 +12,9 @@ import { cn } from "@/lib/utils";
 type Status = "idle" | "wrong" | "right";
 
 const STEPS = [
-  { key: "grammar", label: "Grammar", skill: "bg-skill-write", text: "text-skill-write" },
-  { key: "poetry", label: "Poetry", skill: "bg-skill-lit", text: "text-skill-lit" },
-  { key: "vocab", label: "Vocabulary", skill: "bg-skill-read", text: "text-skill-read" },
+  { key: "grammar", label: "Grammar", skill: "bg-skill-write-ink text-white", text: "text-skill-write-ink" },
+  { key: "poetry", label: "Poetry", skill: "bg-skill-lit text-white", text: "text-skill-lit" },
+  { key: "vocab", label: "Vocabulary", skill: "bg-skill-read-ink text-white", text: "text-skill-read-ink" },
 ] as const;
 
 const XP_PER_STEP = 10;
@@ -125,7 +125,7 @@ export const LessonDemo = () => {
 
   if (done) {
     return (
-      <Shell xp={xp} xpPing={xpPing} progress={3} label="Lesson complete" chipClass="bg-secondary">
+      <Shell xp={xp} xpPing={xpPing} progress={3} label="Lesson complete" chipClass="bg-secondary text-ink">
         <div className="flex flex-1 flex-col items-center justify-center px-6 py-10 text-center">
           <div className="pop-in mb-5 flex h-20 w-20 items-center justify-center rounded-full bg-secondary/20">
             <Flame className="h-10 w-10 text-secondary" strokeWidth={2.4} />
@@ -180,10 +180,10 @@ export const LessonDemo = () => {
                     className={cn(
                       "rounded-xl border-2 px-3 py-2 text-base font-semibold transition-all duration-200 sm:text-lg",
                       solved
-                        ? "pop-in border-success bg-success/10 text-success-dark"
+                        ? "pop-in border-skill-read bg-skill-read/10 text-skill-read-ink"
                         : isPicked
                           ? status === "wrong"
-                            ? "border-destructive bg-destructive/10 text-destructive"
+                            ? "border-skill-write bg-skill-write/10 text-skill-write-ink"
                             : "-translate-y-0.5 border-skill-write bg-skill-write/10 text-ink shadow-sm"
                           : "border-border bg-white text-ink hover:-translate-y-0.5 hover:border-skill-write/50",
                     )}
@@ -284,7 +284,7 @@ export const LessonDemo = () => {
                       "flex h-14 w-full items-center justify-center rounded-xl border-2 border-dashed text-base font-bold transition-all sm:text-lg",
                       slots[i]
                         ? status === "right"
-                          ? "pop-in border-solid border-success bg-success/10 text-success-dark"
+                          ? "pop-in border-solid border-skill-read bg-skill-read/10 text-skill-read-ink"
                           : "border-solid border-skill-read bg-skill-read/10 text-ink"
                         : "border-border text-muted-foreground/50",
                     )}
@@ -331,14 +331,14 @@ export const LessonDemo = () => {
       <div
         className={cn(
           "border-t px-5 py-4 transition-colors duration-300 sm:px-8",
-          status === "right" && "border-success/30 bg-success/10",
-          status === "wrong" && "border-destructive/20 bg-destructive/5",
+          status === "right" && "border-skill-read/30 bg-skill-read/10",
+          status === "wrong" && "border-skill-write/25 bg-skill-write/5",
           status === "idle" && "border-border bg-white",
         )}
       >
         {status === "right" && (
           <div className="rise-in mb-3 flex gap-3">
-            <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-success text-white">
+            <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-skill-read-ink text-white">
               <Check className="h-4 w-4" strokeWidth={3} />
             </span>
             <div className="text-sm leading-relaxed text-ink">
@@ -367,7 +367,7 @@ export const LessonDemo = () => {
 
         {status === "wrong" && (
           <div className="rise-in mb-3 flex gap-3">
-            <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-destructive text-white">
+            <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-skill-write-ink text-white">
               <X className="h-4 w-4" strokeWidth={3} />
             </span>
             <div className="text-sm leading-relaxed text-ink">
@@ -406,7 +406,7 @@ export const LessonDemo = () => {
         {status === "right" ? (
           <button
             onClick={next}
-            className="w-full rounded-full bg-success px-6 py-3.5 font-bold text-white transition hover:brightness-105"
+            className="w-full rounded-full bg-skill-read-ink px-6 py-3.5 font-bold text-white transition hover:brightness-110"
           >
             {step < 2 ? "Continue" : "Finish lesson"}
           </button>
@@ -451,7 +451,7 @@ const Shell = ({
 }) => (
   <div className="relative flex min-h-[470px] flex-col overflow-hidden rounded-[28px] border border-border bg-[#FFFDF8] shadow-[0_30px_60px_-30px_hsl(var(--primary)/0.45)]">
     <div className="flex items-center gap-3 border-b border-border/70 px-5 py-3.5 sm:px-8">
-      <span className={cn("rounded-full px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider text-white", chipClass)}>
+      <span className={cn("rounded-full px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider", chipClass)}>
         {label}
       </span>
       <div className="flex flex-1 gap-1.5">

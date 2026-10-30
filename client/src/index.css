@@ -56,6 +56,10 @@
     --skill-read: 148 58% 43%;            /* #2EAD6B Mikoko */
     --skill-write: 8 77% 60%;             /* #E8604C Matumbawe */
     --skill-lit: 282 36% 36%;             /* #6C3483 Zambarau */
+    --skill-listen-ink: 201 69% 35%;    /* #1B6A96 text on light, and fill under white text */
+    --skill-speak-ink: 37 100% 27%;     /* #8A5600 text on light, and fill under white text */
+    --skill-read-ink: 147 65% 27%;      /* #18703F text on light, and fill under white text */
+    --skill-write-ink: 10 70% 41%;     /* #B0381F text on light, and fill under white text */
 
     --shadow-card: 0 1px 2px hsl(240 23% 14% / 0.04), 0 4px 16px hsl(195 81% 23% / 0.06);
     --shadow-lift: 0 10px 30px -10px hsl(195 81% 23% / 0.25);

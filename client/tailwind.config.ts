@@ -66,6 +66,10 @@ export default {
           read: "hsl(var(--skill-read))",
           write: "hsl(var(--skill-write))",
           lit: "hsl(var(--skill-lit))",
+          "listen-ink": "hsl(var(--skill-listen-ink))",
+          "speak-ink": "hsl(var(--skill-speak-ink))",
+          "read-ink": "hsl(var(--skill-read-ink))",
+          "write-ink": "hsl(var(--skill-write-ink))",
         },
       },
       boxShadow: {

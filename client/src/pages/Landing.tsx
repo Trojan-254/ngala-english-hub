@@ -67,10 +67,10 @@ function useCountUp(target: number, duration = 1400) {
 /* ------------------------------ content ------------------------------ */
 
 const SKILLS = [
-  { word: "Listen", tint: "bg-skill-listen/15", text: "text-skill-listen", Icon: Ear },
-  { word: "Speak", tint: "bg-skill-speak/20", text: "text-[#C9800F]", Icon: Mic },
-  { word: "Write", tint: "bg-skill-write/15", text: "text-skill-write", Icon: PenLine },
-  { word: "Read", tint: "bg-skill-read/15", text: "text-skill-read", Icon: BookOpen },
+  { word: "Listen", tint: "bg-skill-listen/15", text: "text-skill-listen-ink", Icon: Ear },
+  { word: "Speak", tint: "bg-skill-speak/20", text: "text-skill-speak-ink", Icon: Mic },
+  { word: "Write", tint: "bg-skill-write/15", text: "text-skill-write-ink", Icon: PenLine },
+  { word: "Read", tint: "bg-skill-read/15", text: "text-skill-read-ink", Icon: BookOpen },
 ];
 
 const STEPS = [
@@ -115,7 +115,7 @@ const PATHS: {
     title: "Read between the lines",
     blurb: "Comprehension, inference and the vocabulary to back it up.",
     Icon: BookOpen,
-    color: "bg-skill-read",
+    color: "bg-skill-read-ink text-white",
     tint: "bg-skill-read/10",
     items: [
       { name: "Comprehension arena", live: true },
@@ -128,7 +128,7 @@ const PATHS: {
     title: "Write with control",
     blurb: "Grammar that clicks, then writing that persuades.",
     Icon: PenLine,
-    color: "bg-skill-write",
+    color: "bg-skill-write-ink text-white",
     tint: "bg-skill-write/10",
     items: [
       { name: "Grammar arena", live: true },
@@ -141,7 +141,7 @@ const PATHS: {
     title: "Literature, decoded",
     blurb: "Poetry, oral literature and the texts you study, made playable.",
     Icon: Feather,
-    color: "bg-skill-lit",
+    color: "bg-skill-lit text-white",
     tint: "bg-skill-lit/10",
     items: [
       { name: "Poetry: rhythm, imagery, tone", live: false },
@@ -154,7 +154,7 @@ const PATHS: {
     title: "Listen closely",
     blurb: "Tune your ear for tone, intention and detail.",
     Icon: Ear,
-    color: "bg-skill-listen",
+    color: "bg-skill-listen-ink text-white",
     tint: "bg-skill-listen/10",
     items: [
       { name: "Listening comprehension", live: false },
@@ -166,7 +166,7 @@ const PATHS: {
     title: "Sound right",
     blurb: "Pronunciation, stress and intonation with instant feedback.",
     Icon: Mic,
-    color: "bg-skill-speak",
+    color: "bg-skill-speak text-ink",
     tint: "bg-skill-speak/15",
     items: [
       { name: "Pronunciation lab", live: false },
@@ -364,10 +364,10 @@ const Landing = () => {
               </a>
             </div>
 
-            <div className="rise-in mt-6 flex flex-wrap gap-x-5 gap-y-2 text-sm font-medium text-ink/60" style={{ animationDelay: "350ms" }}>
+            <div className="rise-in mt-6 flex flex-wrap gap-x-5 gap-y-2 text-sm font-medium text-ink/65" style={{ animationDelay: "350ms" }}>
               {["No class code needed", "Works on any phone", "Free to start"].map((t) => (
                 <span key={t} className="inline-flex items-center gap-1.5">
-                  <Check className="h-4 w-4 text-success" strokeWidth={3} /> {t}
+                  <Check className="h-4 w-4 text-skill-read-ink" strokeWidth={3} /> {t}
                 </span>
               ))}
             </div>
@@ -392,7 +392,7 @@ const Landing = () => {
               </span>
               <div>
                 <div className="whitespace-nowrap font-bold leading-tight">{t}</div>
-                <div className="text-sm text-ink/60">{s}</div>
+                <div className="text-sm text-ink/65">{s}</div>
               </div>
             </div>
           ))}
@@ -420,7 +420,7 @@ const Landing = () => {
                 <li key={a} className="flex items-center gap-3 text-[15px]">
                   <span className={cn("h-2.5 w-2.5 rounded-full", c)} />
                   <b>{a}</b>
-                  <span className="text-ink/60">{b}</span>
+                  <span className="text-ink/65">{b}</span>
                 </li>
               ))}
             </ul>
@@ -451,12 +451,12 @@ const Landing = () => {
                 className="reveal group relative overflow-hidden rounded-3xl border border-white/10 bg-white/[0.04] p-6 transition hover:-translate-y-1 hover:bg-white/[0.07]"
                 style={{ transitionDelay: `${i * 90}ms` }}
               >
-                <div className={cn("mb-10 flex h-12 w-12 items-center justify-center rounded-2xl font-display text-lg font-extrabold text-ink", s.color)}>
+                <div className={cn("mb-10 flex h-12 w-12 items-center justify-center rounded-2xl font-display text-xl font-extrabold text-ink", s.color)}>
                   {s.n}
                 </div>
                 <StepArt index={i} />
                 <h3 className="font-display text-2xl font-bold">{s.title}</h3>
-                <p className="mt-2 text-[15px] leading-relaxed text-white/65">{s.body}</p>
+                <p className="mt-2 text-[15px] leading-relaxed text-white/70">{s.body}</p>
               </div>
             ))}
           </div>
@@ -477,7 +477,7 @@ const Landing = () => {
               </p>
             </div>
             <div className="flex items-center gap-4 text-sm font-semibold">
-              <span className="inline-flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-success" /> Live now</span>
+              <span className="inline-flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-skill-read-ink" /> Live now</span>
               <span className="inline-flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-ink/25" /> Coming soon</span>
             </div>
           </div>
@@ -493,10 +493,10 @@ const Landing = () => {
                 style={{ transitionDelay: `${i * 70}ms` }}
               >
                 <div className="flex items-center gap-3">
-                  <span className={cn("flex h-11 w-11 items-center justify-center rounded-2xl text-white", p.color)}>
+                  <span className={cn("flex h-11 w-11 items-center justify-center rounded-2xl", p.color)}>
                     <p.Icon className="h-5 w-5" strokeWidth={2.4} />
                   </span>
-                  <span className="text-xs font-bold uppercase tracking-[0.14em] text-ink/50">{p.skill}</span>
+                  <span className="text-xs font-bold uppercase tracking-[0.14em] text-ink/65">{p.skill}</span>
                 </div>
                 <h3 className="font-display mt-5 text-2xl font-bold">{p.title}</h3>
                 <p className="mt-1.5 text-[15px] text-ink/65">{p.blurb}</p>
@@ -511,11 +511,11 @@ const Landing = () => {
                           it.live ? p.color : "bg-ink/10",
                         )}
                       >
-                        {it.live ? <Check className="h-3.5 w-3.5 text-white" strokeWidth={3} /> : <span className="h-1.5 w-1.5 rounded-full bg-ink/30" />}
+                        {it.live ? <Check className="h-3.5 w-3.5" strokeWidth={3} /> : <span className="h-1.5 w-1.5 rounded-full bg-ink/30" />}
                       </span>
-                      <span className={cn("text-[15px]", it.live ? "font-semibold" : "text-ink/55")}>{it.name}</span>
+                      <span className={cn("text-[15px]", it.live ? "font-semibold" : "text-ink/65")}>{it.name}</span>
                       {it.live && (
-                        <span className="ml-auto rounded-full bg-success/10 px-2 py-0.5 text-[11px] font-bold text-success-dark">Live</span>
+                        <span className="ml-auto rounded-full bg-skill-read/10 px-2 py-0.5 text-[11px] font-bold text-skill-read-ink">Live</span>
                       )}
                     </li>
                   ))}
@@ -531,13 +531,13 @@ const Landing = () => {
                   <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-secondary text-ink">
                     <Trophy className="h-5 w-5" strokeWidth={2.4} />
                   </span>
-                  <span className="text-xs font-bold uppercase tracking-[0.14em] text-white/60">Exam room</span>
+                  <span className="text-xs font-bold uppercase tracking-[0.14em] text-white/75">Exam room</span>
                 </div>
                 <h3 className="font-display mt-5 text-2xl font-bold">KCSE past papers</h3>
                 <p className="mt-1.5 text-[15px] text-white/75">
                   Real exam questions with marking guidance, so you know exactly where every mark comes from.
                 </p>
-                <span className="mt-6 inline-flex rounded-full bg-success px-3 py-1 text-xs font-bold">Live now</span>
+                <span className="mt-6 inline-flex rounded-full bg-secondary px-3 py-1 text-xs font-bold text-ink">Live now</span>
               </div>
             </div>
           </div>
@@ -658,7 +658,7 @@ const Landing = () => {
         <div className="mx-auto flex max-w-6xl flex-col items-start justify-between gap-6 px-4 py-10 sm:px-6 md:flex-row md:items-center">
           <div>
             <NgalaLogo />
-            <p className="mt-3 text-sm text-ink/55">Elimu ni mwanga. Education is light.</p>
+            <p className="mt-3 text-sm text-ink/65">Elimu ni mwanga. Education is light.</p>
           </div>
           <nav className="flex flex-wrap gap-x-6 gap-y-2 text-sm font-semibold text-ink/65">
             <a href="#try" className="hover:text-ink">Try a lesson</a>
@@ -667,7 +667,7 @@ const Landing = () => {
             <Link to="/login" className="hover:text-ink">Log in</Link>
             <Link to="/register" className="hover:text-ink">Sign up</Link>
           </nav>
-          <p className="text-sm text-ink/45">© {new Date().getFullYear()} Ngala English Hub</p>
+          <p className="text-sm text-ink/65">© {new Date().getFullYear()} Ngala English Hub</p>
         </div>
       </footer>
     </div>
@@ -698,7 +698,7 @@ const HeroCard = () => {
       {/* floating chips */}
       <div className="float-slower absolute -right-6 bottom-[132px] z-20 hidden rounded-2xl border border-ink/5 bg-white px-3.5 py-2.5 shadow-lift sm:block">
         <div className="flex items-center gap-2 text-sm font-bold">
-          <span className="flex h-6 w-6 items-center justify-center rounded-full bg-success text-white">
+          <span className="flex h-6 w-6 items-center justify-center rounded-full bg-skill-read-ink text-white">
             <Check className="h-3.5 w-3.5" strokeWidth={3} />
           </span>
           Subject-verb agreement
@@ -724,25 +724,25 @@ const HeroCard = () => {
       <div className="relative rotate-[2deg] rounded-[32px] border border-ink/5 bg-white p-6 shadow-[0_40px_80px_-40px_hsl(var(--primary)/0.55)] transition-transform duration-500 hover:rotate-0">
         <div className="flex items-start justify-between">
           <div>
-            <div className="text-xs font-bold uppercase tracking-[0.12em] text-ink/50">Habari, Amani</div>
+            <div className="text-xs font-bold uppercase tracking-[0.12em] text-ink/65">Habari, Amani</div>
             <div className="font-display mt-1 text-xl font-extrabold">Form 3 · Term 2</div>
           </div>
           <span className="rounded-full bg-ink px-3 py-1.5 text-xs font-bold text-white">Level 3 · Wordsmith</span>
         </div>
         <div className="mt-5 grid grid-cols-2 gap-3">
           <div className="rounded-2xl bg-amber-soft p-4">
-            <div className="text-xs font-semibold text-ink/60">Total XP</div>
+            <div className="text-xs font-semibold text-ink/65">Total XP</div>
             <div className="stat-num font-display mt-1 text-3xl">{xp.toLocaleString()}</div>
           </div>
           <div className="rounded-2xl bg-skill-read/10 p-4">
-            <div className="text-xs font-semibold text-ink/60">Streak</div>
+            <div className="text-xs font-semibold text-ink/65">Streak</div>
             <div className="stat-num font-display mt-1 flex items-center gap-1.5 text-3xl">
               <Flame className="h-6 w-6 text-secondary" fill="currentColor" /> {streak}d
             </div>
           </div>
         </div>
         <div className="mt-5">
-          <div className="flex justify-between text-xs font-semibold text-ink/60">
+          <div className="flex justify-between text-xs font-semibold text-ink/65">
             <span>Next rank: Scholar</span>
             <span>74%</span>
           </div>
@@ -756,7 +756,7 @@ const HeroCard = () => {
             <div className="mt-3 font-bold">Grammar drills</div>
             <div className="text-xs text-white/70">8 sets ready</div>
           </div>
-          <div className="rounded-2xl bg-skill-read p-4 text-white">
+          <div className="rounded-2xl bg-skill-read-ink p-4 text-white">
             <BookOpen className="h-5 w-5" />
             <div className="mt-3 font-bold">Reading</div>
             <div className="text-xs text-white/80">3 new passages</div>
@@ -792,7 +792,7 @@ const StepArt = ({ index }: { index: number }) => {
             key={w}
             className={cn(
               "float-slower rounded-lg px-2 py-1 text-xs font-bold",
-              i === 1 ? "bg-skill-speak text-ink" : "bg-white/10 text-white/60 line-through",
+              i === 1 ? "bg-skill-speak text-ink" : "bg-white/10 text-white/70 line-through",
             )}
             style={{ animationDelay: `${i * 0.5}s` }}
           >
@@ -848,10 +848,10 @@ const RankLadder = () => (
               <Icon className="h-[18px] w-[18px]" strokeWidth={2.3} />
             </span>
             <div className="flex-1">
-              <div className={cn("font-bold", state === "locked" && "text-ink/45")}>{r.name}</div>
-              <div className="text-xs text-ink/50">{r.xp}</div>
+              <div className={cn("font-bold", state === "locked" && "text-ink/65")}>{r.name}</div>
+              <div className="text-xs text-ink/65">{r.xp}</div>
             </div>
-            {state === "done" && <Check className="h-5 w-5 text-success" strokeWidth={3} />}
+            {state === "done" && <Check className="h-5 w-5 text-skill-read-ink" strokeWidth={3} />}
             {state === "current" && <span className="text-xs font-bold text-primary">You are here</span>}
           </li>
         );
@@ -863,10 +863,10 @@ const RankLadder = () => (
 const SparkDiagram = () => {
   // The logo's spark, enlarged: one point per skill, rising from the open book.
   const tips = [
-    { t: "Listen", x: 50, y: 6, c: "bg-skill-listen text-white", align: "-translate-x-1/2 -translate-y-full" },
+    { t: "Listen", x: 50, y: 6, c: "bg-skill-listen-ink text-white", align: "-translate-x-1/2 -translate-y-full" },
     { t: "Speak", x: 86, y: 38, c: "bg-skill-speak text-ink", align: "-translate-y-1/2" },
-    { t: "Write", x: 14, y: 38, c: "bg-skill-write text-white", align: "-translate-x-full -translate-y-1/2" },
-    { t: "Read", x: 50, y: 100, c: "bg-skill-read text-white", align: "-translate-x-1/2" },
+    { t: "Write", x: 14, y: 38, c: "bg-skill-write-ink text-white", align: "-translate-x-full -translate-y-1/2" },
+    { t: "Read", x: 50, y: 100, c: "bg-skill-read-ink text-white", align: "-translate-x-1/2" },
   ];
   return (
     <div className="relative mx-auto my-8 aspect-square w-[260px] sm:w-[300px]">
