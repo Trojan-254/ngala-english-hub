@@ -8,7 +8,6 @@ const { requireAuth } = require('../middleware/auth');
 const SALT_ROUNDS = 10;
 const SESSION_DURATION_DAYS = 7;
 const MIN_PASSWORD_LENGTH = 6;
-const ALLOWED_CURRICULA = ['844', 'CBE'];
 const { INDEPENDENT_GROUP } = require('../services/groups');
 
 function generateSessionId() {
@@ -61,7 +60,7 @@ router.post('/register', (req, res) => {
       curriculum = code.curriculum;
     } else {
       class_group = INDEPENDENT_GROUP;
-      curriculum = ALLOWED_CURRICULA.includes(req.body.curriculum) ? req.body.curriculum : 'CBE';
+      curriculum = 'CBE'; // Ngala follows the CBC only
     }
   }
 

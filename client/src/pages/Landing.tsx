@@ -194,7 +194,7 @@ const FAQS = [
   },
   {
     q: "Which curriculum does it follow?",
-    a: "Both. Pick CBC (Grade 10 to 12) or 8-4-4 (Form 3 and 4) when you sign up and your practice follows your syllabus, including KCSE-style past papers.",
+    a: "The CBC. Pick your grade (10, 11 or 12) when you sign up and your practice follows the senior school English syllabus.",
   },
   {
     q: "Will it work on my phone?",
@@ -343,8 +343,8 @@ const Landing = () => {
 
             <p className="rise-in mt-7 max-w-xl text-lg leading-relaxed text-ink/70" style={{ animationDelay: "150ms" }}>
               Ngala is an interactive English and Literature tutor for secondary students. Short lessons you play
-              instead of read, instant feedback on every answer, and a streak that pulls you back tomorrow. CBC and
-              8-4-4 aligned.
+              instead of read, instant feedback on every answer, and a streak that pulls you back tomorrow. Built for
+              the CBC.
             </p>
 
             <div className="rise-in mt-8 flex flex-col gap-3 sm:flex-row" style={{ animationDelay: "250ms" }}>
@@ -381,8 +381,8 @@ const Landing = () => {
       <section className="border-y border-ink/5 bg-white/60">
         <div className="mx-auto grid max-w-6xl grid-cols-1 gap-5 px-4 py-7 sm:grid-cols-2 sm:px-6 md:grid-cols-4">
           {[
-            { Icon: GraduationCap, t: "CBC and 8-4-4", s: "Aligned to your syllabus" },
-            { Icon: ScrollText, t: "KCSE past papers", s: "Timed, marked, explained" },
+            { Icon: GraduationCap, t: "CBC aligned", s: "Senior school English" },
+            { Icon: ScrollText, t: "Exam practice", s: "Timed, marked, explained" },
             { Icon: Feather, t: "Teacher-written", s: "By a practising English teacher" },
             { Icon: Smartphone, t: "Light on data", s: "No video, works on any phone" },
           ].map(({ Icon, t, s }) => (
@@ -533,7 +533,7 @@ const Landing = () => {
                   </span>
                   <span className="text-xs font-bold uppercase tracking-[0.14em] text-white/75">Exam room</span>
                 </div>
-                <h3 className="font-display mt-5 text-2xl font-bold">KCSE past papers</h3>
+                <h3 className="font-display mt-5 text-2xl font-bold">Past exam papers</h3>
                 <p className="mt-1.5 text-[15px] text-white/75">
                   Real exam questions with marking guidance, so you know exactly where every mark comes from.
                 </p>
@@ -725,7 +725,7 @@ const HeroCard = () => {
         <div className="flex items-start justify-between">
           <div>
             <div className="text-xs font-bold uppercase tracking-[0.12em] text-ink/65">Habari, Amani</div>
-            <div className="font-display mt-1 text-xl font-extrabold">Form 3 · Term 2</div>
+            <div className="font-display mt-1 text-xl font-extrabold">Grade 10 · Term 2</div>
           </div>
           <span className="rounded-full bg-ink px-3 py-1.5 text-xs font-bold text-white">Level 3 · Wordsmith</span>
         </div>

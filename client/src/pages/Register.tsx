@@ -6,13 +6,12 @@ import { NgalaLogo } from '@/components/brand/Logo';
 import { cn } from '@/lib/utils';
 
 // Open enrolment: any student can join. A teacher's class code is optional.
+// Ngala follows the CBC (CBE) senior school syllabus only.
 const LEVELS = [
-  { id: 'Form 3', curriculum: '844', group: '8-4-4' },
-  { id: 'Form 4', curriculum: '844', group: '8-4-4' },
-  { id: 'Grade 10', curriculum: 'CBE', group: 'CBC' },
-  { id: 'Grade 11', curriculum: 'CBE', group: 'CBC' },
-  { id: 'Grade 12', curriculum: 'CBE', group: 'CBC' },
-  { id: 'Other', curriculum: 'CBE', group: 'Just improving' },
+  { id: 'Grade 10', group: 'Senior school' },
+  { id: 'Grade 11', group: 'Senior school' },
+  { id: 'Grade 12', group: 'Senior school' },
+  { id: 'Other', group: 'Just improving' },
 ];
 
 const inputCls =
@@ -55,7 +54,7 @@ const Register = () => {
     }
     const code = form.class_code.trim().toUpperCase();
     if (!code && !level) {
-      setError('Choose your class or grade so we can match your syllabus');
+      setError('Choose your grade so we can match your syllabus');
       return;
     }
 
@@ -68,7 +67,7 @@ const Register = () => {
         username: form.username.trim().toLowerCase(),
         password: form.password,
         ...(code ? { class_code: code } : {}),
-        ...(chosen ? { curriculum: chosen.curriculum } : {}),
+        ...(chosen ? { curriculum: 'CBE' } : {}),
       });
       navigate('/dashboard');
     } catch (err: unknown) {
@@ -148,8 +147,8 @@ const Register = () => {
             </div>
 
             <fieldset>
-              <legend className="block text-sm font-semibold text-foreground mb-2">Your class or grade</legend>
-              <div className="grid grid-cols-3 gap-2">
+              <legend className="block text-sm font-semibold text-foreground mb-2">Your grade</legend>
+              <div className="grid grid-cols-2 gap-2">
                 {LEVELS.map(l => (
                   <button
                     type="button"
@@ -187,7 +186,7 @@ const Register = () => {
                     type="text"
                     value={form.class_code}
                     onChange={handleChange}
-                    placeholder="e.g. F3L-2026"
+                    placeholder="e.g. G10E-2026"
                     className={cn(inputCls, 'uppercase')}
                   />
                   <p className="mt-1 text-[11px] text-muted-foreground">

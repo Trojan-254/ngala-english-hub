@@ -118,9 +118,8 @@ export function DifficultySelector({ value, onChange }: { value: Difficulty; onC
 }
 export function CurriculumSelector({ value, onChange }: { value: Curriculum; onChange: (v: Curriculum) => void }) {
   const items: { v: Curriculum; label: string }[] = [
-    { v: "both", label: "Both" },
-    { v: "844", label: "8-4-4" },
     { v: "CBE", label: "CBE" },
+    { v: "both", label: "General" },
   ];
   return (
     <div style={{ display: "flex", gap: 8 }}>

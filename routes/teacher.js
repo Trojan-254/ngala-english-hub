@@ -292,10 +292,12 @@ router.get('/codes', requireTeacher, (req, res) => {
 
 router.post('/codes', requireTeacher, (req, res) => {
   const db = getDb();
-  const { code, class_group, curriculum, expires_days = 90 } = req.body;
+  const { code, class_group, expires_days = 90 } = req.body;
+  // Ngala follows the CBC only; 8-4-4 class codes are no longer created.
+  const curriculum = 'CBE';
 
-  if (!code || !class_group || !curriculum) {
-    return res.status(400).json({ error: 'code, class_group and curriculum are required' });
+  if (!code || !class_group) {
+    return res.status(400).json({ error: 'code and class_group are required' });
   }
 
   // Check code not already taken

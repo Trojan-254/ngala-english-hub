@@ -248,7 +248,7 @@ export default function GrammarContent() {
         ))}
       </div>
       <div style={{ display: "flex", gap: 6 }}>
-        {(["both", "844", "CBE"] as Curriculum[]).map(c => (
+        {(["CBE", "both"] as Curriculum[]).map(c => (
           <button
             key={c}
             onClick={() => setNewTopicCurriculum(c)}
@@ -259,7 +259,7 @@ export default function GrammarContent() {
               color: newTopicCurriculum === c ? "#fff" : T.textSecondary,
             }}
           >
-            {c === "both" ? "Both" : c}
+            {c === "both" ? "General" : c}
           </button>
         ))}
       </div>
