@@ -1,7 +1,22 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { BookOpen } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
+import { NgalaLogo } from '@/components/brand/Logo';
+import { cn } from '@/lib/utils';
+
+// Open enrolment: any student can join. A teacher's class code is optional.
+const LEVELS = [
+  { id: 'Form 3', curriculum: '844', group: '8-4-4' },
+  { id: 'Form 4', curriculum: '844', group: '8-4-4' },
+  { id: 'Grade 10', curriculum: 'CBE', group: 'CBC' },
+  { id: 'Grade 11', curriculum: 'CBE', group: 'CBC' },
+  { id: 'Grade 12', curriculum: 'CBE', group: 'CBC' },
+  { id: 'Other', curriculum: 'CBE', group: 'Just improving' },
+];
+
+const inputCls =
+  'w-full px-4 py-2.5 rounded-lg border border-border bg-background text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition';
 
 const Register = () => {
   const { register } = useAuth();
@@ -13,6 +28,8 @@ const Register = () => {
     password: '',
     class_code: '',
   });
+  const [level, setLevel] = useState<string>('');
+  const [showCode, setShowCode] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -24,14 +41,25 @@ const Register = () => {
     e.preventDefault();
     setError('');
 
-    if (form.password.length < 4) {
-      setError('Password must be at least 4 characters');
-      return;
-    }
     if (form.username.length < 3) {
       setError('Username must be at least 3 characters');
       return;
     }
+    if (!/^[a-z0-9_]+$/i.test(form.username)) {
+      setError('Username can only use letters, numbers and underscores');
+      return;
+    }
+    if (form.password.length < 6) {
+      setError('Password must be at least 6 characters');
+      return;
+    }
+    const code = form.class_code.trim().toUpperCase();
+    if (!code && !level) {
+      setError('Choose your class or grade so we can match your syllabus');
+      return;
+    }
+
+    const chosen = LEVELS.find(l => l.id === level);
 
     setLoading(true);
     try {
@@ -39,7 +67,8 @@ const Register = () => {
         display_name: form.display_name.trim(),
         username: form.username.trim().toLowerCase(),
         password: form.password,
-        class_code: form.class_code.trim().toUpperCase(),
+        ...(code ? { class_code: code } : {}),
+        ...(chosen ? { curriculum: chosen.curriculum } : {}),
       });
       navigate('/dashboard');
     } catch (err: unknown) {
@@ -50,26 +79,17 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-6">
-      <div className="w-full max-w-[420px]">
+    <div className="min-h-screen bg-sand flex items-center justify-center p-6">
+      <div className="w-full max-w-[440px]">
 
-        {/* Logo */}
-        <div className="flex items-center justify-center gap-3 mb-8">
-          <div className="w-12 h-12 rounded-xl bg-primary flex items-center justify-center">
-            <BookOpen className="w-6 h-6 text-white" strokeWidth={2.5} />
-          </div>
-          <div>
-            <div className="text-2xl font-extrabold text-primary tracking-tight">Ngala</div>
-            <div className="text-[11px] font-bold text-secondary uppercase tracking-widest">English Hub</div>
-          </div>
-        </div>
+        <Link to="/" className="flex justify-center mb-8" aria-label="Ngala home">
+          <NgalaLogo animated />
+        </Link>
 
-        {/* Card */}
-        <div className="bg-card rounded-2xl border border-border p-8"
-          style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.08)' }}>
-          <h1 className="text-xl font-extrabold text-foreground">Create your account</h1>
+        <div className="bg-card rounded-3xl border border-border p-8 shadow-card">
+          <h1 className="font-display text-2xl font-extrabold text-ink tracking-tight">Create your free account</h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Get your class code from your teacher before registering
+            Open to every student, anywhere. No class code needed.
           </p>
 
           {error && (
@@ -80,78 +100,109 @@ const Register = () => {
 
           <form onSubmit={handleSubmit} className="mt-6 space-y-4">
             <div>
-              <label className="block text-sm font-semibold text-foreground mb-1.5">
-                Full Name
-              </label>
+              <label className="block text-sm font-semibold text-foreground mb-1.5">Your name</label>
               <input
                 name="display_name"
                 type="text"
                 value={form.display_name}
                 onChange={handleChange}
-                placeholder="e.g. John Otieno"
+                placeholder="e.g. Amani"
                 required
                 autoFocus
-                className="w-full px-4 py-2.5 rounded-lg border border-border bg-background text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition"
+                className={inputCls}
               />
+              <p className="mt-1 text-[11px] text-muted-foreground">
+                First name or a nickname is fine. This is what others see on leaderboards.
+              </p>
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-foreground mb-1.5">
-                Username
-              </label>
+              <label className="block text-sm font-semibold text-foreground mb-1.5">Username</label>
               <input
                 name="username"
                 type="text"
                 value={form.username}
                 onChange={handleChange}
-                placeholder="e.g. john_otieno"
+                placeholder="e.g. amani_reads"
                 required
-                className="w-full px-4 py-2.5 rounded-lg border border-border bg-background text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition"
+                autoComplete="username"
+                className={inputCls}
               />
               <p className="mt-1 text-[11px] text-muted-foreground">
-                Lowercase letters, numbers and underscores only
+                Letters, numbers and underscores only
               </p>
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-foreground mb-1.5">
-                Password
-              </label>
+              <label className="block text-sm font-semibold text-foreground mb-1.5">Password</label>
               <input
                 name="password"
                 type="password"
                 value={form.password}
                 onChange={handleChange}
-                placeholder="At least 4 characters"
+                placeholder="At least 6 characters"
                 required
-                className="w-full px-4 py-2.5 rounded-lg border border-border bg-background text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition"
+                autoComplete="new-password"
+                className={inputCls}
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-semibold text-foreground mb-1.5">
-                Class Code
-              </label>
-              <input
-                name="class_code"
-                type="text"
-                value={form.class_code}
-                onChange={handleChange}
-                placeholder="e.g. F3L-2026"
-                required
-                className="w-full px-4 py-2.5 rounded-lg border border-border bg-background text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition uppercase"
-              />
-              <p className="mt-1 text-[11px] text-muted-foreground">
-                Ask your teacher for this code
-              </p>
+            <fieldset>
+              <legend className="block text-sm font-semibold text-foreground mb-2">Your class or grade</legend>
+              <div className="grid grid-cols-3 gap-2">
+                {LEVELS.map(l => (
+                  <button
+                    type="button"
+                    key={l.id}
+                    onClick={() => setLevel(l.id)}
+                    aria-pressed={level === l.id}
+                    className={cn(
+                      'rounded-xl border-2 px-2 py-2 text-left transition',
+                      level === l.id
+                        ? 'border-primary bg-primary/5'
+                        : 'border-border hover:border-primary/40',
+                    )}
+                  >
+                    <div className="text-sm font-bold text-ink leading-tight">{l.id}</div>
+                    <div className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide">{l.group}</div>
+                  </button>
+                ))}
+              </div>
+            </fieldset>
+
+            <div className="rounded-xl border border-border">
+              <button
+                type="button"
+                onClick={() => setShowCode(s => !s)}
+                className="flex w-full items-center justify-between px-4 py-3 text-sm font-semibold text-foreground"
+                aria-expanded={showCode}
+              >
+                Have a class code from your teacher? <span className="text-muted-foreground font-medium">Optional</span>
+                <ChevronDown className={cn('h-4 w-4 transition-transform', showCode && 'rotate-180')} />
+              </button>
+              {showCode && (
+                <div className="px-4 pb-4">
+                  <input
+                    name="class_code"
+                    type="text"
+                    value={form.class_code}
+                    onChange={handleChange}
+                    placeholder="e.g. F3L-2026"
+                    className={cn(inputCls, 'uppercase')}
+                  />
+                  <p className="mt-1 text-[11px] text-muted-foreground">
+                    Adds you to your teacher's class and class leaderboard
+                  </p>
+                </div>
+              )}
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 rounded-lg bg-primary text-primary-foreground text-sm font-bold hover:brightness-110 transition disabled:opacity-60 disabled:cursor-not-allowed"
+              className="w-full py-3.5 rounded-full bg-secondary text-ink text-sm font-bold hover:brightness-105 transition disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              {loading ? 'Creating account...' : 'Create Account →'}
+              {loading ? 'Creating account...' : 'Create my account'}
             </button>
           </form>
 
@@ -168,4 +219,3 @@ const Register = () => {
 };
 
 export default Register;
-

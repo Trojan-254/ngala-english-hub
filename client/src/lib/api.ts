@@ -41,7 +41,8 @@ export const api = {
       username: string;
       display_name: string;
       password: string;
-      class_code: string;
+      class_code?: string;
+      curriculum?: string;
     }) => request<{ sessionId: string; user: User }>('POST', '/auth/register', payload),
 
     login: (username: string, password: string) =>
