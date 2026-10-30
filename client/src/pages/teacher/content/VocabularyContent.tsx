@@ -79,9 +79,8 @@ export default function VocabularyContent() {
           </FilterSection>
           <FilterSection label="Curriculum">
             <FilterRow active={currFilter === null} onClick={() => setCurrFilter(null)}>All</FilterRow>
-            <FilterRow active={currFilter === "both"} onClick={() => setCurrFilter("both")}>Both</FilterRow>
-            <FilterRow active={currFilter === "844"} onClick={() => setCurrFilter("844")}>8-4-4</FilterRow>
             <FilterRow active={currFilter === "CBE"} onClick={() => setCurrFilter("CBE")}>CBE</FilterRow>
+            <FilterRow active={currFilter === "both"} onClick={() => setCurrFilter("both")}>General</FilterRow>
           </FilterSection>
         </aside>
         <div>
@@ -205,7 +204,7 @@ function WordForm({ initial, onClose, onSaved }: { initial: VocabWord | null; on
         </div>
         <div style={{ gridColumn: "1 / -1" }}>
           <label style={labelStyle}>Example Sentence</label>
-          <textarea rows={2} style={{ ...inputStyle, resize: "vertical" }} value={example} onChange={(e) => setExample(e.target.value)} placeholder="Use the word in a sentence a Form 3 student would understand" required />
+          <textarea rows={2} style={{ ...inputStyle, resize: "vertical" }} value={example} onChange={(e) => setExample(e.target.value)} placeholder="Use the word in a sentence a Grade 10 student would understand" required />
         </div>
         <div>
           <label style={labelStyle}>Synonym (optional, comma-separated)</label>

@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const { INDEPENDENT_GROUP, EXCLUDE_INDEPENDENT } = require('../services/groups');
 const { getDb } = require('../database/database');
 const { requireTeacher } = require('../middleware/auth');
 
@@ -10,12 +11,12 @@ router.get('/overview', requireTeacher, (req, res) => {
 
   const totalStudents = db.prepare(`
     SELECT COUNT(*) as count FROM users
-    WHERE role = 'student' AND is_active = 1
+    WHERE role = 'student' AND is_active = 1 AND COALESCE(class_group, '') <> '${INDEPENDENT_GROUP}'
   `).get();
 
   const classGroups = db.prepare(`
     SELECT COUNT(DISTINCT class_group) as count FROM users
-    WHERE role = 'student' AND is_active = 1 AND class_group IS NOT NULL
+    WHERE role = 'student' AND is_active = 1 AND class_group IS NOT NULL AND COALESCE(class_group, '') <> '${INDEPENDENT_GROUP}'
   `).get();
 
   const weeklyAttempts = db.prepare(`
@@ -75,7 +76,7 @@ router.get('/students', requireTeacher, (req, res) => {
       ROUND(SUM(a.is_correct) * 100.0 / NULLIF(COUNT(a.id), 0), 1) as overall_accuracy
     FROM users u
     LEFT JOIN attempts a ON a.user_id = u.id
-    WHERE u.role = 'student'
+    WHERE u.role = 'student' ${EXCLUDE_INDEPENDENT}
   `;
 
   const params = [];
@@ -131,7 +132,7 @@ router.get('/weak-topics', requireTeacher, (req, res) => {
     JOIN topics t ON q.topic_id = t.id
     JOIN modules m ON t.module_id = m.id
     JOIN users u ON a.user_id = u.id
-    WHERE u.role = 'student'
+    WHERE u.role = 'student' ${EXCLUDE_INDEPENDENT}
       AND a.question_id IS NOT NULL
   `;
 
@@ -169,7 +170,7 @@ router.get('/module-stats', requireTeacher, (req, res) => {
       ROUND(AVG(a.time_taken_ms) / 1000.0, 1) as avg_response_sec
     FROM attempts a
     JOIN users u ON a.user_id = u.id
-    WHERE u.role = 'student'
+    WHERE u.role = 'student' ${EXCLUDE_INDEPENDENT}
   `;
 
   const params = [];
@@ -193,7 +194,7 @@ router.get('/class-groups', requireTeacher, (req, res) => {
     SELECT DISTINCT class_group, curriculum,
       COUNT(*) as student_count
     FROM users
-    WHERE role = 'student'
+    WHERE role = 'student' AND COALESCE(class_group, '') <> '${INDEPENDENT_GROUP}'
       AND is_active = 1
       AND class_group IS NOT NULL
     GROUP BY class_group
@@ -218,7 +219,7 @@ router.get('/leaderboard', requireTeacher, (req, res) => {
       COALESCE(w.weekly_xp, 0) as weekly_xp
     FROM users u
     LEFT JOIN vw_weekly_leaderboard w ON w.id = u.id
-    WHERE u.role = 'student' AND u.is_active = 1
+    WHERE u.role = 'student' AND u.is_active = 1 ${EXCLUDE_INDEPENDENT}
   `;
 
   const params = [];
@@ -291,10 +292,12 @@ router.get('/codes', requireTeacher, (req, res) => {
 
 router.post('/codes', requireTeacher, (req, res) => {
   const db = getDb();
-  const { code, class_group, curriculum, expires_days = 90 } = req.body;
+  const { code, class_group, expires_days = 90 } = req.body;
+  // Ngala follows the CBC only; 8-4-4 class codes are no longer created.
+  const curriculum = 'CBE';
 
-  if (!code || !class_group || !curriculum) {
-    return res.status(400).json({ error: 'code, class_group and curriculum are required' });
+  if (!code || !class_group) {
+    return res.status(400).json({ error: 'code and class_group are required' });
   }
 
   // Check code not already taken
@@ -351,7 +354,7 @@ router.patch('/students/:id', requireTeacher, (req, res) => {
   }
 
   const student = db.prepare(`
-    SELECT * FROM users WHERE id = ? AND role = 'student'
+    SELECT * FROM users WHERE id = ? AND role = 'student' AND COALESCE(class_group, '') <> '${INDEPENDENT_GROUP}'
   `).get(req.params.id);
 
   if (!student) {

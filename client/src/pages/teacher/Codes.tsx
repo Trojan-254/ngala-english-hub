@@ -14,7 +14,6 @@ export default function CodesPage() {
   const [confirmDelete, setConfirmDelete] = useState<number | null>(null);
   const [code, setCode] = useState("");
   const [classGroup, setClassGroup] = useState("");
-  const [curriculum, setCurriculum] = useState<"8-4-4" | "CBE">("CBE");
   const [expiresDays, setExpiresDays] = useState(60);
   const [submitting, setSubmitting] = useState(false);
   const load = () => {
@@ -29,7 +28,7 @@ export default function CodesPage() {
     e.preventDefault();
     setSubmitting(true);
     try {
-      await teacherApi.createCode({ code: code.toUpperCase(), class_group: classGroup, curriculum, expires_days: expiresDays });
+      await teacherApi.createCode({ code: code.toUpperCase(), class_group: classGroup, curriculum: "CBE", expires_days: expiresDays });
       toast.success("Class code created");
       setCode(""); setClassGroup(""); setShowForm(false);
       load();
@@ -71,15 +70,9 @@ export default function CodesPage() {
           marginBottom: showForm ? 20 : 0,
         }}
       >
-        <form onSubmit={submit} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[1fr_1fr_1fr_1fr_auto] gap-3 items-end" style={{ ...cardStyle, padding: 20 }}>
-          <Field label="Code"><input required value={code} onChange={(e) => setCode(e.target.value.toUpperCase().slice(0, 10))} placeholder="e.g. F3L-2026" style={inputStyle} /></Field>
-          <Field label="Class Group"><input required value={classGroup} onChange={(e) => setClassGroup(e.target.value)} placeholder="e.g. Form 3L" style={inputStyle} /></Field>
-          <Field label="Curriculum">
-            <select value={curriculum} onChange={(e) => setCurriculum(e.target.value as "8-4-4" | "CBE")} style={inputStyle}>
-              <option value="CBE">CBE</option>
-              <option value="8-4-4">8-4-4</option>
-            </select>
-          </Field>
+        <form onSubmit={submit} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[1fr_1fr_1fr_auto] gap-3 items-end" style={{ ...cardStyle, padding: 20 }}>
+          <Field label="Code"><input required value={code} onChange={(e) => setCode(e.target.value.toUpperCase().slice(0, 10))} placeholder="e.g. G10E-2026" style={inputStyle} /></Field>
+          <Field label="Class Group"><input required value={classGroup} onChange={(e) => setClassGroup(e.target.value)} placeholder="e.g. Grade 10 East" style={inputStyle} /></Field>
           <Field label="Expires In">
             <select value={expiresDays} onChange={(e) => setExpiresDays(Number(e.target.value))} style={inputStyle}>
               <option value={30}>30 days</option>
